@@ -7,21 +7,30 @@ License::	MIT License.  See MIT-LICENSE file for more details.
 
 Object Daddy is a library (as well as a Ruby on Rails plugin) designed to assist in automating testing of large collections of objects, especially webs of ActiveRecord models.  It is a descendant of the "Object Mother" pattern for creating objects for testing, and is related to the concept of an object Exemplar or "stereotype".  
 
-WARNING:  This code is very much at an "alpha" development stage.  Usage, APIs, etc., are all subject to change.
+WARNING: This code is very much at an "alpha" development stage. Usage, APIs,
+etc., are all subject to change.
 
-TODO:  put linkage into b.logi.cx post about the history.
+TODO: put linkage into b.logi.cx post about the history.
 
 == Installation
 
-Unpack the object_daddy directory into vendor/rails/ in your rails project.  Run the object_daddy/install.rb Ruby script.  A definitive public revision control access point is forthcoming that will make it possible to install the plugin via script/plugin install, which will automatically run the installation hook.
+Unpack the object_daddy directory into vendor/rails/ in your rails project.
+Run the object_daddy/install.rb Ruby script. A definitive public revision
+control access point is forthcoming that will make it possible to install the
+plugin via script/plugin install, which will automatically run the
+installation hook.
 
 == Testing
 
-Install the rspec gem and cd into the object_daddy directory.  Type 'spec spec/' and you should see all specs run successfully.  If you have autotest from the ZenTest gem installed you can run autotest in that directory.
+Install the rspec gem and cd into the object_daddy directory. Type 'spec
+spec/' and you should see all specs run successfully. If you have autotest
+from the ZenTest gem installed you can run autotest in that directory.
 
 == Using Object Daddy
 
-Object Daddy adds a .generate method to every ActiveRecord model which can be called to generate a valid instance object of that model class, for use in testing:
+Object Daddy adds a .generate method to every ActiveRecord model which can be
+called to generate a valid instance object of that model class, for use in
+testing:
 
   it "should have a comment for every forum the user posts to" do
     @user = User.generate.save
@@ -30,9 +39,15 @@ Object Daddy adds a .generate method to every ActiveRecord model which can be ca
     @user.should have(1).comments
   end
 
-This allows us to generate custom model objects without relying on fixtures, and without knowing, in our various widespread tests and specs, the details of creating a User, Post, Comment, what have you.  Not having to know this information means the information isn't coded into dozens (or hundreds) of tests, and won't need to be changed when the User (Post, Comment, ...) model is refactored later.
+This allows us to generate custom model objects without relying on fixtures,
+and without knowing, in our various widespread tests and specs, the details of
+creating a User, Post, Comment, what have you. Not having to know this
+information means the information isn't coded into dozens (or hundreds) of
+tests, and won't need to be changed when the User (Post, Comment, ...) model
+is refactored later.
 
-Object Daddy will identify associated classes that need to be instantiated to make the main model valid.  E.g., given the following models:
+Object Daddy will identify associated classes that need to be instantiated to
+make the main model valid. E.g., given the following models:
 
 class User < ActiveRecord::Base
   belongs_to :login
