@@ -14,6 +14,7 @@ module ObjectDaddy
     
   module ClassMethods
     attr_accessor :exemplars_generated, :exemplar_path, :generators
+    attr_reader :presence_validated_attributes
     protected :exemplars_generated=
     
     # create a valid instance of this class, using any known generators
@@ -36,7 +37,7 @@ module ObjectDaddy
           end
         end
       end
-      if @presence_validated_attributes
+      if self.presence_validated_attributes
         req = HashWithIndifferentAccess.new
         (@presence_validated_attributes.keys - args.keys).each {|a| req[a] = true } # find attributes required by validates_presence_of not already set
         missing = reflect_on_all_associations(:belongs_to).to_a.select {|a| req[a.name] or req[a.primary_key_name] } # limit to those which are belongs_to associations
@@ -91,7 +92,9 @@ module ObjectDaddy
     
     def validates_presence_of_with_object_daddy(*attr_names)
       @presence_validated_attributes ||= {} 
-      attr_names.each {|a| @presence_validated_attributes[a] = true }
+      new_attr = attr_names
+      new_attr.pop if new_attr.last.is_a?(Hash) 
+      new_attr.each {|a| @presence_validated_attributes[a] = true }
       validates_presence_of_without_object_daddy(attr_names)
     end
   end

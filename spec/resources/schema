@@ -1,6 +1,7 @@
 ActiveRecord::Schema.define(:version => 0) do
   create_table :frobnitzs, :force => true do |t|
     t.column :name, :string
+	t.column :title, :string
     t.column :foo_id, :integer
     t.column :thing_id, :integer
   end

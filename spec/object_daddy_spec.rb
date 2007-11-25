@@ -222,6 +222,7 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     validates_presence_of :foo
     validates_presence_of :thing_id
     validates_presence_of :name
+    validates_presence_of :title, :on => :create, :message => "can't be blank"
   end
 
   describe ObjectDaddy, "when integrated with Rails" do
@@ -252,6 +253,10 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     
     it "should use specified values for attributes that do not have generators" do
       Frobnitz.generate(:name => 'test').name.should == 'test'
+    end
+    
+    it "should ignore optional arguments to presence_of validators" do
+      Frobnitz.should have(4).presence_validated_attributes
     end
   end
 end
