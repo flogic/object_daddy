@@ -38,7 +38,7 @@ module ObjectDaddy
       end
       if @presence_validated_attributes
         req = {}
-        (@presence_validated_attributes - args.keys).each {|a| req[a] = true } # find attributes required by validates_presence_of not already set
+        (@presence_validated_attributes.keys - args.keys).each {|a| req[a] = true } # find attributes required by validates_presence_of not already set
         missing = reflect_on_all_associations.to_a.select {|a| a.macro == :belongs_to }.select {|a| req[a.name] } # limit to those which are belongs_to associations
         missing.each {|a| args[a.name] = a.class_name.constantize.generate }
       end
@@ -90,7 +90,8 @@ module ObjectDaddy
     end
     
     def validates_presence_of_with_object_daddy(*attr_names)
-      @presence_validated_attributes = attr_names
+      @presence_validated_attributes ||= {} 
+      attr_names.each {|a| @presence_validated_attributes[a] = true }
       validates_presence_of_without_object_daddy(attr_names)
     end
   end

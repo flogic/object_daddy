@@ -234,8 +234,14 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.generate
     end
     
-    it "should not generate instances of attributes which are required by a presence_of validator but are not associations" do
-      Frobnitz.generate
+    it "should use specified values for attributes that would otherwise be generated" do
+      Foo.expects(:generate).never
+      foo = Foo.new
+      Frobnitz.generate(:foo => foo).foo.should == foo
+    end
+    
+    it "should use specified values for attributes that do not have generators" do
+      Frobnitz.generate(:name => 'test').name.should == 'test'
     end
   end
 else
