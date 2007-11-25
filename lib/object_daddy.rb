@@ -37,9 +37,9 @@ module ObjectDaddy
         end
       end
       if @presence_validated_attributes
-        req = {}
+        req = HashWithIndifferentAccess.new
         (@presence_validated_attributes.keys - args.keys).each {|a| req[a] = true } # find attributes required by validates_presence_of not already set
-        missing = reflect_on_all_associations.to_a.select {|a| a.macro == :belongs_to }.select {|a| req[a.name] } # limit to those which are belongs_to associations
+        missing = reflect_on_all_associations(:belongs_to).to_a.select {|a| req[a.name] or req[a.primary_key_name] } # limit to those which are belongs_to associations
         missing.each {|a| args[a.name] = a.class_name.constantize.generate }
       end
       self.new(args)
