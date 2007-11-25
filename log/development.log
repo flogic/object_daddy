@@ -1,0 +1,134 @@
+  [4;36;1mSQL (0.052267)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'foo_development.schema_info' doesn't exist: SELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.128811)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.018108)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.449580)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.340255)[0m   [0mCREATE DATABASE `foo_test`[0m
+  [4;36;1mSQL (0.000167)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'foo_development.schema_info' doesn't exist: SELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.036919)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000155)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.001143)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.000763)[0m   [0mCREATE DATABASE `foo_test`[0m
+  [4;36;1mSQL (0.000178)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'foo_development.schema_info' doesn't exist: SELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000395)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000131)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.000876)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.000677)[0m   [0mCREATE DATABASE `foo_test`[0m
+  [4;36;1mSQL (0.000183)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.525952)[0m   [0mCREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.079141)[0m   [0;1mINSERT INTO schema_info (version) VALUES(0)[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000317)[0m   [0;1mSELECT * FROM schema_info[0m
+  [4;35;1mSQL (0.001027)[0m   [0mSHOW TABLES[0m
+  [4;36;1mSQL (0.000175)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000211)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000407)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000149)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.001128)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.000491)[0m   [0mCREATE DATABASE `foo_test`[0m
+  [4;36;1mSQL (0.000132)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.003163)[0m   [0mCREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000793)[0m   [0;1mINSERT INTO schema_info (version) VALUES(0)[0m
+  [4;35;1mSQL (0.175654)[0m   [0mSHOW FIELDS FROM schema_info[0m
+  [4;36;1mSQL (0.011856)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;36;1mSQL (0.000193)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000215)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000435)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000259)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.456295)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.000775)[0m   [0mCREATE DATABASE `foo_test`[0m
+  [4;36;1mSQL (0.000146)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.002900)[0m   [0mCREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.001151)[0m   [0;1mINSERT INTO schema_info (version) VALUES(0)[0m
+  [4;35;1mSQL (0.001987)[0m   [0mSHOW FIELDS FROM schema_info[0m
+  [4;36;1mSQL (0.000988)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;36;1mSQL (0.000177)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000219)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000376)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.032729)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.215281)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.117422)[0m   [0mCREATE DATABASE `foo_test` DEFAULT CHARACTER SET `utf8`[0m
+  [4;36;1mSQL (0.000151)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.002910)[0m   [0mCREATE TABLE `schema_info` (version int(11))[0m
+  [4;36;1mSQL (0.000783)[0m   [0;1mINSERT INTO `schema_info` (version) VALUES(0)[0m
+  [4;35;1mSQL (0.002039)[0m   [0mSHOW FIELDS FROM `schema_info`[0m
+  [4;36;1mSQL (0.001264)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;36;1mSQL (0.000187)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000213)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000449)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000136)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.022272)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.012429)[0m   [0mCREATE DATABASE `foo_test` DEFAULT CHARACTER SET `utf8`[0m
+  [4;36;1mSQL (0.000142)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.002956)[0m   [0mCREATE TABLE `schema_info` (version int(11))[0m
+  [4;36;1mSQL (0.000712)[0m   [0;1mINSERT INTO `schema_info` (version) VALUES(0)[0m
+  [4;35;1mSQL (0.001867)[0m   [0mSHOW FIELDS FROM `schema_info`[0m
+  [4;36;1mSQL (0.001836)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;36;1mSQL (0.000193)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000212)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000438)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000130)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.002092)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.000536)[0m   [0mCREATE DATABASE `foo_test` DEFAULT CHARACTER SET `utf8`[0m
+  [4;36;1mSQL (0.000143)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.002675)[0m   [0mCREATE TABLE `schema_info` (version int(11))[0m
+  [4;36;1mSQL (0.000675)[0m   [0;1mINSERT INTO `schema_info` (version) VALUES(0)[0m
+  [4;35;1mSQL (0.002445)[0m   [0mSHOW FIELDS FROM `schema_info`[0m
+  [4;36;1mSQL (0.000888)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;36;1mSQL (0.000165)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000233)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000376)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000143)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.037191)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.001049)[0m   [0mCREATE DATABASE `foo_test` DEFAULT CHARACTER SET `utf8`[0m
+  [4;36;1mSQL (0.000145)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.003725)[0m   [0mCREATE TABLE `schema_info` (version int(11))[0m
+  [4;36;1mSQL (0.001226)[0m   [0;1mINSERT INTO `schema_info` (version) VALUES(0)[0m
+  [4;35;1mSQL (0.001775)[0m   [0mSHOW FIELDS FROM `schema_info`[0m
+  [4;36;1mSQL (0.001127)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;36;1mSQL (0.000194)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000216)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000441)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000150)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.531884)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.000944)[0m   [0mCREATE DATABASE `foo_test`[0m
+  [4;36;1mSQL (0.000132)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.002825)[0m   [0mCREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000561)[0m   [0;1mINSERT INTO schema_info (version) VALUES(0)[0m
+  [4;35;1mSQL (0.001882)[0m   [0mSHOW FIELDS FROM schema_info[0m
+  [4;36;1mSQL (0.002382)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;36;1mSQL (0.000263)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.006792)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000635)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000146)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.179228)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.000673)[0m   [0mCREATE DATABASE `foo_test`[0m
+  [4;36;1mSQL (0.000159)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.002352)[0m   [0mCREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000729)[0m   [0;1mINSERT INTO schema_info (version) VALUES(0)[0m
+  [4;35;1mSQL (0.002665)[0m   [0mSHOW FIELDS FROM schema_info[0m
+  [4;36;1mSQL (0.001599)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;36;1mSQL (0.000182)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000217)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000395)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000121)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.002516)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.000647)[0m   [0mCREATE DATABASE `foo_test`[0m
+  [4;36;1mSQL (0.000136)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.002774)[0m   [0mCREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000718)[0m   [0;1mINSERT INTO schema_info (version) VALUES(0)[0m
+  [4;35;1mSQL (0.002023)[0m   [0mSHOW FIELDS FROM schema_info[0m
+  [4;36;1mSQL (0.001079)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;36;1mSQL (0.000187)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.040003)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.021891)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000149)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.272416)[0m   [0;1mDROP DATABASE IF EXISTS `foo_test`[0m
+  [4;35;1mSQL (0.018017)[0m   [0mCREATE DATABASE `foo_test`[0m
+  [4;36;1mSQL (0.000155)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.106700)[0m   [0mCREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.021649)[0m   [0;1mINSERT INTO schema_info (version) VALUES(0)[0m
+  [4;35;1mSQL (0.029116)[0m   [0mSHOW FIELDS FROM schema_info[0m
+  [4;36;1mSQL (0.003329)[0m   [0;1mUPDATE schema_info SET version = 0[0m
