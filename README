@@ -5,7 +5,11 @@ Author::	Rick Bradley (mailto:blogicx@rickbradley.com), Yossef Mendelssohn (ymen
 Copyright::	Copyright (c) Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
 License::	MIT License.  See MIT-LICENSE file for more details.
 
-Object Daddy is a library (as well as a Ruby on Rails plugin) designed to assist in automating testing of large collections of objects, especially webs of ActiveRecord models.  It is a descendant of the "Object Mother" pattern for creating objects for testing, and is related to the concept of an object Exemplar or "stereotype".  
+Object Daddy is a library (as well as a Ruby on Rails plugin) designed to
+assist in automating testing of large collections of objects, especially webs
+of ActiveRecord models. It is a descendant of the "Object Mother" pattern for
+creating objects for testing, and is related to the concept of an object
+Exemplar or "stereotype".
 
 WARNING: This code is very much at an "alpha" development stage. Usage, APIs,
 etc., are all subject to change.
