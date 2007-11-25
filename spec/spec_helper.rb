@@ -1,23 +1,20 @@
-# This file is copied to ~/spec when you run 'ruby script/generate rspec'
-# from the project root directory.
-ENV["RAILS_ENV"] = "test"
-require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-require 'spec/rails'
+$:.unshift(File.dirname(__FILE__) + '/../lib/')
 
 Spec::Runner.configure do |config|
-  config.use_transactional_fixtures = true
-  config.use_instantiated_fixtures  = false
-  config.fixture_path = RAILS_ROOT + '/spec/fixtures'
+  config.mock_with :mocha
+end
 
-  # You can declare fixtures for each behaviour like this:
-  #   describe "...." do
-  #     fixtures :table_a, :table_b
-  #
-  # Alternatively, if you prefer to declare them only once, you can
-  # do so here, like so ...
-  #
-  #   config.global_fixtures = :table_a, :table_b
-  #
-  # If you declare global fixtures, be aware that they will be declared
-  # for all of your examples, even those that don't use them.
+def setup_rails_database
+  dir = File.dirname(__FILE__)
+
+  ENV["RAILS_ENV"] ||= "test"
+  require "#{dir}/../../../../config/environment"
+
+  db = YAML::load(IO.read("#{dir}/resources/config/database.yml"))
+  ActiveRecord::Base.configurations = {'test' => db[ENV['DB'] || 'sqlite3']}
+  ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations['test'])
+  ActiveRecord::Migration.verbose = false
+  require "#{dir}/resources/schema"  
+
+  require "#{dir}/../init.rb"
 end
