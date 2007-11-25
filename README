@@ -1,0 +1,154 @@
+= Object Daddy
+<b>Version 0.0.1 (Nov 25, 2007)</b>
+
+Author::	Rick Bradley (mailto:blogicx@rickbradley.com), Yossef Mendelssohn (ymendel@pobox.com)
+Copyright::	Copyright (c) Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
+License::	MIT License.  See MIT-LICENSE file for more details.
+
+Object Daddy is a library (as well as a Ruby on Rails plugin) designed to assist in automating testing of large collections of objects, especially webs of ActiveRecord models.  It is a descendant of the "Object Mother" pattern for creating objects for testing, and is related to the concept of an object Exemplar or "stereotype".  
+
+WARNING:  This code is very much at an "alpha" development stage.  Usage, APIs, etc., are all subject to change.
+
+TODO:  put linkage into b.logi.cx post about the history.
+
+== Installation
+
+Unpack the object_daddy directory into vendor/rails/ in your rails project.  Run the object_daddy/install.rb Ruby script.  A definitive public revision control access point is forthcoming that will make it possible to install the plugin via script/plugin install, which will automatically run the installation hook.
+
+== Testing
+
+Install the rspec gem and cd into the object_daddy directory.  Type 'spec spec/' and you should see all specs run successfully.  If you have autotest from the ZenTest gem installed you can run autotest in that directory.
+
+== Using Object Daddy
+
+Object Daddy adds a .generate method to every ActiveRecord model which can be called to generate a valid instance object of that model class, for use in testing:
+
+  it "should have a comment for every forum the user posts to" do
+    @user = User.generate.save
+    @post = Post.generate.save
+    @post.comments << Comment.generate
+    @user.should have(1).comments
+  end
+
+This allows us to generate custom model objects without relying on fixtures, and without knowing, in our various widespread tests and specs, the details of creating a User, Post, Comment, what have you.  Not having to know this information means the information isn't coded into dozens (or hundreds) of tests, and won't need to be changed when the User (Post, Comment, ...) model is refactored later.
+
+Object Daddy will identify associated classes that need to be instantiated to make the main model valid.  E.g., given the following models:
+
+class User < ActiveRecord::Base
+  belongs_to :login
+  validates_presence_of :login
+end
+
+class Login < ActiveRecord::Base
+  has_one :user
+end
+
+a call to User.generate will also make a call to Login.generate so that
+User#login is present, and therefore valid.
+
+
+If all models were able to be created in a valid form by the default Model.new
+call with no knowledge of the model itself, there'd be no need for Object
+Daddy. So, when we deal with models which have validity requirements,
+requiring fields which have format constraints, we need a means of expressing
+how to create those models -- how to satisfy those validity constraints.
+Object Daddy provides a "generator_for" method which allows the developer to
+specify, for a specific model attribute, how to make a valid value. Note that
+"validates_uniqueness_of" can require that, even if we make 100,000 instances
+of a model that unique attributes cannot have the same values.
+
+Object Daddy's :generator_for method can take three forms, corresponding to
+the means of finding a value for the associated attribute: a block, a method
+call, or using a generator class.
+
+class User < ActiveRecord::Base
+  validates_presence_of :email
+  validates_uniqueness_of :email
+  validates_format_of :email, 
+	:with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
+  validates_presence_of :username
+  validates_format_of :username, :with => /^[a-z0-9_]{4,12}$/i
+
+  generator_for :email, :start => 'test@domain.com' do |prev|
+    user, domain = prev.split('@')
+    user.succ + '@' + domain
+  end
+
+  generator_for :username, :method => :next_user
+
+  generator_for :ssn, :class => SSNGenerator
+
+  def self.next_user
+    @last_username ||= 'testuser'
+    @last_username.succ
+  end
+end
+
+class SSNGenerator
+  def self.next
+    @last ||= '000-00-0000'
+	@last = ("%09d" % (@last.gsub('-', '').to_i + 1)).sub(/^(\d{3})(\d{2})(\d{4})$/, '\1-\2-\3')
+  end
+end
+
+
+
+Note that the block method of invocation (as used with :email above) takes an
+optional :start argument, to specify the value of that attribute on the first
+run. The block will be called thereafter with the previous value of the
+attribute and will generate the next attribute value to be used.
+
+The :method form take a symbol naming a class method in the model class to be
+called to generate a new value for the attribute in question.
+
+The :class form calls the .next class method on the named class to generate a
+new value for the attribute in question.
+
+The developer would then simply call 'User.generate' when testing.
+
+If some attribute values are known (or are being controlled during testing)
+then these can simply be passed in to .generate:
+
+  @bad_login = Login.generate(:expiry => 1.week.ago)
+  @expired_user = User.generate(:login => @bad_login)
+
+== Exemplars
+
+In the examples given above we are using 'generator_for' in the bodies of the
+models themselves. Given that Object Daddy is primarily geared towards
+annotating models with information useful for testing, we anticipate that
+generator_for should not normally be included inline in models. Rather, we
+will provide a place where model classes can be re-opened and generator_for
+calls (and support methods) can be written without polluting the model files
+with Object Daddy information.
+
+Object Daddy, when installed as a Rails plugin, will create
+RAILS_ROOT/test/exemplars/ as a place to hold "exemplar" files for Rails model
+classes.  (We are seeking perhaps some better terminology)
+
+An exemplar for the User model would then be found in
+RAILS_ROOT/test/exemplars/user_exemplar.rb. Exemplar files are completely
+optional, and no model need have exemplar files. The .generate method will
+still exist and be callable, and generator_for can be declared in the model
+files themselves. If an exemplar file is available when .generate is called on
+a model, the exemplar file will be loaded and used. An example
+user_exemplar.rb appears below:
+
+require 'ssn_generator'
+
+class User < ActiveRecord::Base
+  generator_for :email, :start => 'test@domain.com' do |prev|
+    user, domain = prev.split('@')
+    user.succ + '@' + domain
+  end
+
+  generator_for :username, :method => :next_user
+
+  generator_for :ssn, :class => SSNGenerator
+
+  def self.next_user
+    @last_username ||= 'testuser'
+    @last_username.succ
+  end
+end
+
