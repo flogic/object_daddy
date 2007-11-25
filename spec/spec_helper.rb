@@ -14,7 +14,7 @@ def setup_rails_database
   ActiveRecord::Base.configurations = {'test' => db[ENV['DB'] || 'sqlite3']}
   ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations['test'])
   ActiveRecord::Migration.verbose = false
-  require "#{dir}/resources/schema"  
+  load "#{dir}/resources/schema"  
 
   require "#{dir}/../init.rb"
 end
