@@ -2,7 +2,7 @@
 <b>Version 0.0.1 (Nov 25, 2007)</b>
 
 Author::	Rick Bradley (mailto:blogicx@rickbradley.com), Yossef Mendelssohn (ymendel@pobox.com)
-Copyright::	Copyright (c) Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
+Copyright::	Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
 License::	MIT License.  See MIT-LICENSE file for more details.
 
 Object Daddy is a library (as well as a Ruby on Rails plugin) designed to
@@ -45,10 +45,9 @@ testing:
 
 This allows us to generate custom model objects without relying on fixtures,
 and without knowing, in our various widespread tests and specs, the details of
-creating a User, Post, Comment, what have you. Not having to know this
-information means the information isn't coded into dozens (or hundreds) of
-tests, and won't need to be changed when the User (Post, Comment, ...) model
-is refactored later.
+creating a User, Post, Comment, etc. Not having to know this information means
+the information isn't coded into dozens (or hundreds) of tests, and won't need
+to be changed when the User (Post, Comment, ...) model is refactored later.
 
 Object Daddy will identify associated classes that need to be instantiated to
 make the main model valid. E.g., given the following models:
@@ -71,6 +70,7 @@ call with no knowledge of the model itself, there'd be no need for Object
 Daddy. So, when we deal with models which have validity requirements,
 requiring fields which have format constraints, we need a means of expressing
 how to create those models -- how to satisfy those validity constraints.
+
 Object Daddy provides a "generator_for" method which allows the developer to
 specify, for a specific model attribute, how to make a valid value. Note that
 "validates_uniqueness_of" can require that, even if we make 100,000 instances
@@ -117,7 +117,7 @@ optional :start argument, to specify the value of that attribute on the first
 run. The block will be called thereafter with the previous value of the
 attribute and will generate the next attribute value to be used.
 
-The :method form take a symbol naming a class method in the model class to be
+The :method form takes a symbol naming a class method in the model class to be
 called to generate a new value for the attribute in question.
 
 The :class form calls the .next class method on the named class to generate a
@@ -171,3 +171,8 @@ class User < ActiveRecord::Base
   end
 end
 
+== Object Daddy and Fixtures
+
+While Object Daddy is meant to obviate the hellish devilspawn that are test
+fixtures, Object Daddy should work alongside fixtures just fine. To each his
+own, I suppose.
