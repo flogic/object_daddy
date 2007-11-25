@@ -254,9 +254,5 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.generate(:name => 'test').name.should == 'test'
     end
   end
-else
-  describe ObjectDaddy, "when not integrated with Rails" do
-    it "shouldn't do railsy shizzle"
-  end
 end
 
