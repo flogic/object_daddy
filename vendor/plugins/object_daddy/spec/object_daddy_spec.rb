@@ -212,10 +212,15 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
   class Bar < ActiveRecord::Base
   end
   
+  class Thing < ActiveRecord::Base
+  end
+
   class Frobnitz < ActiveRecord::Base
     belongs_to :foo
     belongs_to :bar
+    belongs_to :thing
     validates_presence_of :foo
+    validates_presence_of :thing_id
     validates_presence_of :name
   end
 
@@ -223,9 +228,14 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     it "should base the exemplar path off RAILS_ROOT for ActiveRecord models" do
       Frobnitz.exemplar_path.should == File.join(RAILS_ROOT, 'test', 'exemplars')
     end
-    
-    it "should generate instances of any belongs_to associations which are required by a presence_of validator" do
+
+    it "should generate instances of any belongs_to associations which are required by a presence_of validator for the association name" do
       Foo.expects(:generate).returns(Foo.new)
+      Frobnitz.generate
+    end
+
+    it "should generate instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
+      Thing.expects(:generate).returns(Thing.new)
       Frobnitz.generate
     end
     
