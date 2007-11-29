@@ -223,6 +223,7 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     validates_presence_of :thing_id
     validates_presence_of :name
     validates_presence_of :title, :on => :create, :message => "can't be blank"
+    validates_format_of   :title, :with => /^\d+$/
   end
 
   describe ObjectDaddy, "when integrated with Rails" do
@@ -258,6 +259,21 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     it "should ignore optional arguments to presence_of validators" do
       Frobnitz.should have(4).presence_validated_attributes
     end
+    
+    it "should return an unsaved record if generating" do
+      Frobnitz.generate.should be_new_record
+    end
+    
+    it "should fail if trying to generate and save an invalid object" do
+      lambda { Frobnitz.generate!(:title => 'bob') }.should raise_error(ActiveRecord::RecordInvalid)
+    end
+    
+    it "should return a valid object if generate and save succeeds" do
+      Frobnitz.generate!(:title => '5').should be_valid
+    end
+    
+    it "should return a saved object if generate and save succeeds" do
+      Frobnitz.generate!(:title => '5').should_not be_new_record
+    end
   end
 end
-
