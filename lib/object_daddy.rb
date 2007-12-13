@@ -92,10 +92,10 @@ module ObjectDaddy
     
     def validates_presence_of_with_object_daddy(*attr_names)
       @presence_validated_attributes ||= {} 
-      new_attr = attr_names
+      new_attr = attr_names.dup
       new_attr.pop if new_attr.last.is_a?(Hash) 
       new_attr.each {|a| @presence_validated_attributes[a] = true }
-      validates_presence_of_without_object_daddy(attr_names)
+      validates_presence_of_without_object_daddy(*attr_names)
     end
     
     def generate!(args = {})

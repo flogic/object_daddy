@@ -225,6 +225,9 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     validates_presence_of :title, :on => :create, :message => "can't be blank"
     validates_format_of   :title, :with => /^\d+$/
   end
+  
+  class Blah < ActiveRecord::Base
+  end
 
   describe ObjectDaddy, "when integrated with Rails" do
     it "should base the exemplar path off RAILS_ROOT for ActiveRecord models" do
@@ -256,6 +259,12 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.generate(:name => 'test').name.should == 'test'
     end
     
+    it 'should pass the supplied validator options to the real validator method' do
+      Blah.expects(:validates_presence_of_without_object_daddy).with(:bam, :if => :make_it_so)
+      Blah.validates_presence_of :bam, :if => :make_it_so
+    end
+
+    # what is this testing?
     it "should ignore optional arguments to presence_of validators" do
       Frobnitz.should have(4).presence_validated_attributes
     end
