@@ -238,7 +238,7 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Foo.expects(:generate).returns(Foo.new)
       Frobnitz.generate
     end
-
+    
     it "should generate and save instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
       thing = Thing.create(:name => 'some thing')
       Thing.expects(:generate!).returns(thing)
@@ -250,21 +250,25 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.generate
     end
     
+    it "should not generate any values for attributes that do not have generators" do
+      Frobnitz.generate.name.should be_nil
+    end
+
+    it "should use specified values for attributes that do not have generators" do
+      Frobnitz.generate(:name => 'test').name.should == 'test'
+    end
+    
     it "should use specified values for attributes that would otherwise be generated" do
       Foo.expects(:generate).never
       foo = Foo.new
       Frobnitz.generate(:foo => foo).foo.should == foo
     end
     
-    it "should use specified values for attributes that do not have generators" do
-      Frobnitz.generate(:name => 'test').name.should == 'test'
-    end
-    
     it 'should pass the supplied validator options to the real validator method' do
       Blah.expects(:validates_presence_of_without_object_daddy).with(:bam, :if => :make_it_so)
       Blah.validates_presence_of :bam, :if => :make_it_so
     end
-
+    
     # what is this testing?
     it "should ignore optional arguments to presence_of validators" do
       Frobnitz.should have(4).presence_validated_attributes
