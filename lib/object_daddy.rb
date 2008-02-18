@@ -92,7 +92,7 @@ module ObjectDaddy
     def record_generator_for(handle, generator)
       self.generators ||= {}
       raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if generators[handle]
-      generators[handle] = { :generator => generator }
+      generators[handle] = { :generator => generator, :source => self }
     end
   end
   

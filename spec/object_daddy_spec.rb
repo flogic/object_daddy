@@ -106,6 +106,11 @@ describe ObjectDaddy, 'recording the registration of a generator method' do
     @class.generators['handle'][:generator].should == 'generator'
   end
   
+  it 'should save the class that specified the generator' do
+    @class.record_generator_for('handle', 'generator')
+    @class.generators['handle'][:source].should == @class
+  end
+  
   it 'should fail if the handle has already been recorded' do
     @class.record_generator_for('handle', 'generator')
     lambda { @class.record_generator_for('handle', 'generator 2') }.should raise_error
