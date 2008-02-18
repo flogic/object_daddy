@@ -22,12 +22,12 @@ describe ObjectDaddy, "when registering a generator method" do
   before(:each) do
     @class = Class.new(OpenStruct)
     @class.send(:include, ObjectDaddy)
-  end  
-
+  end
+  
   it "should fail unless an attribute name is provided" do
     lambda { @class.generator_for }.should raise_error(ArgumentError)
   end
-
+  
   it "should fail if an attribute is specified that already has a generator" do
     @class.generator_for :foo do |prev| end
     lambda { @class.generator_for :foo do |prev| end }.should raise_error(ArgumentError)
@@ -79,6 +79,40 @@ describe ObjectDaddy, "when registering a generator method" do
   
   it "should fail unless a generator block, generator class, or generator method is provided" do
     lambda { @class.generator_for 'foo' }.should raise_error(ArgumentError)
+  end
+end
+
+describe ObjectDaddy, 'recording the registration of a generator method' do
+  before(:each) do
+    ObjectDaddy::ClassMethods.send(:public, :record_generator_for)
+    @class = Class.new(OpenStruct)
+    @class.send(:include, ObjectDaddy)
+  end
+  
+  it 'should accept a handle and data' do
+    lambda { @class.record_generator_for('handle', 'data') }.should_not raise_error(ArgumentError)
+  end
+  
+  it 'should require data' do
+    lambda { @class.record_generator_for('handle') }.should raise_error(ArgumentError)
+  end
+  
+  it 'should require a handle' do
+    lambda { @class.record_generator_for }.should raise_error(ArgumentError)
+  end
+  
+  it 'should save the data' do
+    @class.record_generator_for('handle', 'data')
+    @class.generators['handle'].should == 'data'
+  end
+  
+  it 'should fail if the handle already has data' do
+    @class.record_generator_for('handle', 'data')
+    lambda { @class.record_generator_for('handle', 'data') }.should raise_error
+  end
+  
+  it 'should not fail if the handle does not have data' do
+    lambda { @class.record_generator_for('handle', 'data') }.should_not raise_error
   end
 end
 

@@ -58,20 +58,18 @@ module ObjectDaddy
     # generator_for :foo, :method => :method_name
     def generator_for(handle, args = {}, &block)
       raise ArgumentError, "an attribute name must be specified" unless handle = handle.to_sym
-      self.generators ||= {}
-      raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if generators[handle]
-
+      
       if args[:method]
         raise ArgumentError, "generator method :[#{args[:method]}] is not known" unless respond_to?(args[:method].to_sym)
-        generators[handle] = { :method => args[:method].to_sym }
+        record_generator_for(handle, :method => args[:method].to_sym)
       elsif args[:class]
         raise ArgumentError, "generator class [#{args[:class].name}] does not have a :next method" unless args[:class].respond_to?(:next)
-        generators[handle] = { :class => args[:class] }
+        record_generator_for(handle, :class => args[:class])
       elsif block
         raise ArgumentError, "generator block must take a single argument" unless block.arity == 1
         h = { :block => block }
         h[:start] = args[:start] if args[:start]
-        generators[handle] = h
+        record_generator_for(handle, h)
       else
         raise ArgumentError, "a block, :class generator, or :method generator must be specified to generator_for"
       end
@@ -88,6 +86,12 @@ module ObjectDaddy
     # we define an underscore helper ourselves since the ActiveSupport isn't available if we're not using Rails
     def underscore(string)
       string.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
+    end
+    
+    def record_generator_for(handle, data)
+      self.generators ||= {}
+      raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if generators[handle]
+      generators[handle] = data
     end
   end
   
