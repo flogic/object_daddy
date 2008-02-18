@@ -283,11 +283,11 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     end
     
     it "should return a valid object if generate and save succeeds" do
-      Frobnitz.generate!(:title => '5').should be_valid
+      Frobnitz.generate!(:title => '5', :name => 'blah').should be_valid
     end
     
     it "should return a saved object if generate and save succeeds" do
-      Frobnitz.generate!(:title => '5').should_not be_new_record
+      Frobnitz.generate!(:title => '5', :name => 'blah').should_not be_new_record
     end
   end
 end
