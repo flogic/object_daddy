@@ -239,8 +239,9 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.generate
     end
 
-    it "should generate instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
-      Thing.expects(:generate).returns(Thing.new)
+    it "should generate and save instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
+      thing = Thing.create(:name => 'some thing')
+      Thing.expects(:generate!).returns(thing)
       Frobnitz.generate
     end
     
