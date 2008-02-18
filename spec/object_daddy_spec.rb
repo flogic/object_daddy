@@ -11,7 +11,7 @@ describe ObjectDaddy, "when included into a class" do
   it "should provide a means of generating a class instance" do
     @class.should respond_to(:generate)
   end
-
+  
   it "should provide a means of registering a generator to assist in creating class instances" do
     @class.should respond_to(:generator_for)
   end
@@ -230,10 +230,14 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
   end
 
   describe ObjectDaddy, "when integrated with Rails" do
+    it "should provide a means of generating and saving a class instance" do
+      Frobnitz.should respond_to(:generate!)
+    end
+    
     it "should base the exemplar path off RAILS_ROOT for ActiveRecord models" do
       Frobnitz.exemplar_path.should == File.join(RAILS_ROOT, 'test', 'exemplars')
     end
-
+    
     it "should generate instances of any belongs_to associations which are required by a presence_of validator for the association name" do
       Foo.expects(:generate).returns(Foo.new)
       Frobnitz.generate

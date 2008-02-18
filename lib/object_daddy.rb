@@ -89,8 +89,6 @@ module ObjectDaddy
     def underscore(string)
       string.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
     end
-    
-    def
   end
   
   module RailsClassMethods
