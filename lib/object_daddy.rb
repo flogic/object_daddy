@@ -19,25 +19,23 @@ module ObjectDaddy
     
     # create a valid instance of this class, using any known generators
     def generate(args = {})
-      self.gather_exemplars unless exemplars_generated
-      if self.generators
-        self.generators.each_pair do |handle, generator|
-          next if args[handle]
-          if generator[:block]
-            if generator[:start]
-              generator[:prev] = args[handle] = generator[:start]
-              generator.delete(:start)
-            else
-              generator[:prev] = args[handle] = generator[:block].call(generator[:prev])
-            end
-          elsif generator[:method]
-            args[handle] = self.send(generator[:method])
-          elsif generator[:class]
-            args[handle] = generator[:class].next
+      gather_exemplars unless exemplars_generated
+      (generators || {}).each_pair do |handle, generator|
+        next if args[handle]
+        if generator[:block]
+          if generator[:start]
+            generator[:prev] = args[handle] = generator[:start]
+            generator.delete(:start)
+          else
+            generator[:prev] = args[handle] = generator[:block].call(generator[:prev])
           end
+        elsif generator[:method]
+          args[handle] = send(generator[:method])
+        elsif generator[:class]
+          args[handle] = generator[:class].next
         end
       end
-      if self.presence_validated_attributes
+      if presence_validated_attributes
         req = {}
         (@presence_validated_attributes.keys - args.keys).each {|a| req[a.to_s] = true } # find attributes required by validates_presence_of not already set
         
@@ -51,7 +49,7 @@ module ObjectDaddy
         missing[:name].each {|a| args[a.name] = a.class_name.constantize.generate }
         missing[:col].each {|a| args[a.name] = a.class_name.constantize.generate! }
       end
-      self.new(args)
+      new(args)
     end
 
     # register a generator for an attribute of this class
@@ -61,19 +59,19 @@ module ObjectDaddy
     def generator_for(handle, args = {}, &block)
       raise ArgumentError, "an attribute name must be specified" unless handle = handle.to_sym
       self.generators ||= {}
-      raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if self.generators[handle]
+      raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if generators[handle]
 
       if args[:method]
-        raise ArgumentError, "generator method :[#{args[:method]}] is not known" unless self.respond_to?(args[:method].to_sym)
-        self.generators[handle] = { :method => args[:method].to_sym }
+        raise ArgumentError, "generator method :[#{args[:method]}] is not known" unless respond_to?(args[:method].to_sym)
+        generators[handle] = { :method => args[:method].to_sym }
       elsif args[:class]
         raise ArgumentError, "generator class [#{args[:class].name}] does not have a :next method" unless args[:class].respond_to?(:next)
-        self.generators[handle] = { :class => args[:class] }
+        generators[handle] = { :class => args[:class] }
       elsif block
         raise ArgumentError, "generator block must take a single argument" unless block.arity == 1
         h = { :block => block }
         h[:start] = args[:start] if args[:start]
-        self.generators[handle] = h
+        generators[handle] = h
       else
         raise ArgumentError, "a block, :class generator, or :method generator must be specified to generator_for"
       end
@@ -82,15 +80,17 @@ module ObjectDaddy
   protected
     
     def gather_exemplars
-      self.exemplars_generated = true
-      path = File.join(exemplar_path, "#{underscore(self.name)}_exemplar.rb")
+      path = File.join(exemplar_path, "#{underscore(name)}_exemplar.rb")
       load(path) if File.exists?(path)
+      self.exemplars_generated = true
     end
     
     # we define an underscore helper ourselves since the ActiveSupport isn't available if we're not using Rails
     def underscore(string)
       string.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
     end
+    
+    def
   end
   
   module RailsClassMethods
