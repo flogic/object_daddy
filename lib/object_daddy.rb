@@ -20,8 +20,9 @@ module ObjectDaddy
     # create a valid instance of this class, using any known generators
     def generate(args = {})
       gather_exemplars unless exemplars_generated
-      (generators || {}).each_pair do |handle, generator|
+      (generators || {}).each_pair do |handle, gen_data|
         next if args[handle]
+        generator = gen_data[:generator]
         if generator[:block]
           if generator[:start]
             generator[:prev] = args[handle] = generator[:start]
@@ -88,10 +89,10 @@ module ObjectDaddy
       string.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
     end
     
-    def record_generator_for(handle, data)
+    def record_generator_for(handle, generator)
       self.generators ||= {}
       raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if generators[handle]
-      generators[handle] = data
+      generators[handle] = { :generator => generator }
     end
   end
   

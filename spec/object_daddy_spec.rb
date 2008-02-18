@@ -89,11 +89,11 @@ describe ObjectDaddy, 'recording the registration of a generator method' do
     @class.send(:include, ObjectDaddy)
   end
   
-  it 'should accept a handle and data' do
-    lambda { @class.record_generator_for('handle', 'data') }.should_not raise_error(ArgumentError)
+  it 'should accept a handle and generator' do
+    lambda { @class.record_generator_for('handle', 'generator') }.should_not raise_error(ArgumentError)
   end
   
-  it 'should require data' do
+  it 'should require generator' do
     lambda { @class.record_generator_for('handle') }.should raise_error(ArgumentError)
   end
   
@@ -101,18 +101,18 @@ describe ObjectDaddy, 'recording the registration of a generator method' do
     lambda { @class.record_generator_for }.should raise_error(ArgumentError)
   end
   
-  it 'should save the data' do
-    @class.record_generator_for('handle', 'data')
-    @class.generators['handle'].should == 'data'
+  it 'should save the generator' do
+    @class.record_generator_for('handle', 'generator')
+    @class.generators['handle'][:generator].should == 'generator'
   end
   
-  it 'should fail if the handle already has data' do
-    @class.record_generator_for('handle', 'data')
-    lambda { @class.record_generator_for('handle', 'data') }.should raise_error
+  it 'should fail if the handle has already been recorded' do
+    @class.record_generator_for('handle', 'generator')
+    lambda { @class.record_generator_for('handle', 'generator 2') }.should raise_error
   end
   
-  it 'should not fail if the handle does not have data' do
-    lambda { @class.record_generator_for('handle', 'data') }.should_not raise_error
+  it 'should not fail if the handle has not already been recorded' do
+    lambda { @class.record_generator_for('handle', 'generator') }.should_not raise_error
   end
 end
 
