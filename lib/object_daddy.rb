@@ -60,6 +60,14 @@ module ObjectDaddy
     def generator_for(handle, args = {}, &block)
       raise ArgumentError, "an attribute name must be specified" unless handle = handle.to_sym
       
+      if !args.is_a?(Hash)
+        unless block
+          retval = args
+          block = lambda { retval }  # lambda { args } results in returning the empty hash that args gets changed to
+        end
+        args = {}  # args is assumed to be a hash for the rest of the method
+      end
+      
       if args[:method]
         raise ArgumentError, "generator method :[#{args[:method]}] is not known" unless respond_to?(args[:method].to_sym)
         record_generator_for(handle, :method => args[:method].to_sym)
@@ -72,7 +80,7 @@ module ObjectDaddy
         h[:start] = args[:start] if args[:start]
         record_generator_for(handle, h)
       else
-        raise ArgumentError, "a block, :class generator, or :method generator must be specified to generator_for"
+        raise ArgumentError, "a block, :class generator, :method generator, or value must be specified to generator_for"
       end
     end
     

@@ -81,7 +81,11 @@ describe ObjectDaddy, "when registering a generator method" do
     lambda { @class.generator_for :foo, :method => :fake_method }.should raise_error(ArgumentError)
   end
   
-  it "should fail unless a generator block, generator class, or generator method is provided" do
+  it 'should succeed if a value is provided' do
+    lambda { @class.generator_for :foo, 'value' }.should_not raise_error(ArgumentError)
+  end
+  
+  it "should fail unless a generator block, generator class, generator method, or value is provided" do
     lambda { @class.generator_for 'foo' }.should raise_error(ArgumentError)
   end
 end
@@ -238,6 +242,12 @@ describe ObjectDaddy, "when generating a class instance" do
   it 'should use the return value for a block generator that takes no argument' do
     x = 5
     @class.generator_for(:foo) { x }
+    @class.generate.foo.should == x
+  end
+  
+  it 'should use the supplied value for the generated value' do
+    x = 5
+    @class.generator_for :foo, x
     @class.generate.foo.should == x
   end
   
