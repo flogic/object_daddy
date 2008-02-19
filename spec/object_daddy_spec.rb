@@ -121,10 +121,6 @@ describe ObjectDaddy, 'recording the registration of a generator method' do
   end
 end
 
-# a dummy class, useful for testing the actual loading of exemplar files
-class Widget < OpenStruct
-end
-
 describe ObjectDaddy, "when generating a class instance" do
   before(:each) do
     @class = Class.new(OpenStruct)
@@ -159,11 +155,12 @@ describe ObjectDaddy, "when generating a class instance" do
   it "should register any generators found in the exemplar for the target class" do 
     # we are using the concrete Widget class here because otherwise it's difficult to have our exemplar file work in our class
     begin
+      # a dummy class, useful for testing the actual loading of exemplar files
+      Widget = Class.new(OpenStruct) { include ObjectDaddy }
       File.open(@file_name, 'w') {|f| f.puts "class Widget\ngenerator_for :foo\nend\n"}
-        Widget.send :include, ObjectDaddy
-        Widget.stubs(:exemplar_path).returns(@file_path)
-        Widget.expects(:generator_for)
-        Widget.generate
+      Widget.stubs(:exemplar_path).returns(@file_path)
+      Widget.expects(:generator_for)
+      Widget.generate
     ensure
       # clean up test data file
       File.unlink(@file_name) if File.exists?(@file_name)
@@ -237,6 +234,70 @@ describe ObjectDaddy, "when generating a class instance" do
   it "should call the normal target class constructor" do
     @class.expects(:new)
     @class.generate
+  end
+  
+  describe 'for a subclass' do
+    before :each do
+      @subclass = Class.new(@class)
+      @subclass.send(:include, ObjectDaddy)
+      @subfile_path = File.join(File.dirname(__FILE__), 'tmp')
+      @subfile_name = File.join(@file_path, 'sub_widget_exemplar.rb')
+      @subclass.stubs(:exemplar_path).returns(@file_path)
+      @subclass.stubs(:name).returns('SubWidget')
+    end
+    
+    describe 'using generators from files' do
+      before :each do
+        # FIXME: get rid of 'already initialized constant' warnings
+        Widget = Class.new(OpenStruct) { include ObjectDaddy }
+        SubWidget = Class.new(Widget)  { include ObjectDaddy }
+        
+        Widget.stubs(:exemplar_path).returns(@file_path)
+        SubWidget.stubs(:exemplar_path).returns(@subfile_path)
+        
+        File.open(@file_name, 'w') do |f|
+          f.puts "class Widget\ngenerator_for :blah do |prev| 'blah'; end\nend\n"
+        end
+      end
+      
+      after :each do
+        [@file_name, @subfile_name].each { |file|  File.unlink(file) if File.exists?(file) }
+      end
+      
+      it 'should use generators from the parent class' do
+        SubWidget.generate.blah.should == 'blah'
+      end
+      
+      it 'should let subclass generators override parent generators' do
+        File.open(@subfile_name, 'w') do |f|
+          f.puts "class SubWidget\ngenerator_for :blah do |prev| 'blip'; end\nend\n"
+        end
+        SubWidget.generate.blah.should == 'blip'
+      end
+    end
+    
+    describe 'using generators called directly' do
+      it 'should use generators from the parent class' do
+        @class.generator_for :blah do |prev| 'blah'; end
+        @subclass.generate.blah.should == 'blah'
+      end
+      
+      it 'should let subclass generators override parent generators' do
+        pending 'figuring out what to do about this, including deciding whether or not this is even important' do
+          @class.generator_for :blah do |prev| 'blah'; end
+          # p @class
+          # p @subclass
+          # @subclass.send(:gather_exemplars)
+          # p @subclass.generators
+          @subclass.generator_for :blah do |prev| 'blip'; end
+          # @subclass.send(:gather_exemplars)
+          # p @subclass.generators
+          # p @subclass.generators[:blah][:generator][:block].call
+          # @subclass.send(:gather_exemplars)
+          @subclass.generate.blah.should == 'blip'
+        end
+      end
+    end
   end
 end
 

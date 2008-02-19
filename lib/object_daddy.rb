@@ -79,6 +79,11 @@ module ObjectDaddy
   protected
     
     def gather_exemplars
+      if superclass.respond_to?(:gather_exemplars)
+        superclass.gather_exemplars
+        self.generators = (superclass.generators || {}).dup
+      end
+      
       path = File.join(exemplar_path, "#{underscore(name)}_exemplar.rb")
       load(path) if File.exists?(path)
       self.exemplars_generated = true
@@ -91,7 +96,7 @@ module ObjectDaddy
     
     def record_generator_for(handle, generator)
       self.generators ||= {}
-      raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if generators[handle]
+      raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if (generators[handle] || {})[:source] == self
       generators[handle] = { :generator => generator, :source => self }
     end
   end
