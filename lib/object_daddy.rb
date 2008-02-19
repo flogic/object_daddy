@@ -67,7 +67,7 @@ module ObjectDaddy
         raise ArgumentError, "generator class [#{args[:class].name}] does not have a :next method" unless args[:class].respond_to?(:next)
         record_generator_for(handle, :class => args[:class])
       elsif block
-        raise ArgumentError, "generator block must take a single argument" unless block.arity == 1
+        raise ArgumentError, "generator block must take an optional single argument" unless (-1..1).include?(block.arity)  # NOTE: lambda {} has an arity of -1, while lambda {||} has an arity of 0
         h = { :block => block }
         h[:start] = args[:start] if args[:start]
         record_generator_for(handle, h)

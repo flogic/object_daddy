@@ -49,8 +49,12 @@ describe ObjectDaddy, "when registering a generator method" do
     lambda { @class.generator_for :foo do |prev| end }.should_not raise_error
   end
   
-  it "should fail if a generator block doesn't handle a previous value" do
-    lambda { @class.generator_for :foo, :first => 'baz' do end }.should raise_error(ArgumentError)
+  it "should not fail if a generator block doesn't handle a previous value" do
+    lambda { @class.generator_for :foo, :first => 'baz' do end }.should_not raise_error(ArgumentError)
+  end
+  
+  it "should fail if a generator block expects more than one argument" do
+    lambda { @class.generator_for :foo, :first => 'baz' do |x, y| end }.should raise_error(ArgumentError)
   end
   
   it "should allow an initial value with a block argument" do
@@ -229,6 +233,12 @@ describe ObjectDaddy, "when generating a class instance" do
     @class.generator_for :foo do |prev| prev ? prev.succ : 'test'; end
     @class.generate
     @class.generate.foo.should == 'tesu'
+  end
+  
+  it 'should use the return value for a block generator that takes no argument' do
+    x = 5
+    @class.generator_for(:foo) { x }
+    @class.generate.foo.should == x
   end
   
   it "should call the normal target class constructor" do
