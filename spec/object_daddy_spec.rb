@@ -85,6 +85,14 @@ describe ObjectDaddy, "when registering a generator method" do
     lambda { @class.generator_for :foo, 'value' }.should_not raise_error(ArgumentError)
   end
   
+  it 'should succeed when given an attr => value hash' do
+    lambda { @class.generator_for :foo => 'value' }.should_not raise_error(ArgumentError)
+  end
+  
+  it 'should fail when given an attr => value hash with multiple attrs' do
+    lambda { @class.generator_for :foo => 'value', :bar => 'other value' }.should raise_error(ArgumentError)
+  end
+  
   it "should fail unless a generator block, generator class, generator method, or value is provided" do
     lambda { @class.generator_for 'foo' }.should raise_error(ArgumentError)
   end
@@ -248,6 +256,12 @@ describe ObjectDaddy, "when generating a class instance" do
   it 'should use the supplied value for the generated value' do
     x = 5
     @class.generator_for :foo, x
+    @class.generate.foo.should == x
+  end
+  
+  it 'should use the supplied attr => value value for the generated value' do
+    x = 5
+    @class.generator_for :foo => x
     @class.generate.foo.should == x
   end
   

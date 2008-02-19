@@ -58,9 +58,16 @@ module ObjectDaddy
     # generator_for :foo, :class => GeneratorClass
     # generator_for :foo, :method => :method_name
     def generator_for(handle, args = {}, &block)
+      if handle.is_a?(Hash)
+        raise ArgumentError, "only specify one attr => value pair at a time" unless handle.keys.length == 1
+        gen_data = handle
+        handle = gen_data.keys.first
+        args = gen_data[handle]
+      end
+      
       raise ArgumentError, "an attribute name must be specified" unless handle = handle.to_sym
       
-      if !args.is_a?(Hash)
+      unless args.is_a?(Hash)
         unless block
           retval = args
           block = lambda { retval }  # lambda { args } results in returning the empty hash that args gets changed to
