@@ -54,7 +54,10 @@ module ObjectDaddy
     end
 
     # register a generator for an attribute of this class
+    # generator_for :foo do |prev| ... end
     # generator_for :foo do ... end
+    # generator_for :foo, value
+    # generator_for :foo => value
     # generator_for :foo, :class => GeneratorClass
     # generator_for :foo, :method => :method_name
     def generator_for(handle, args = {}, &block)
