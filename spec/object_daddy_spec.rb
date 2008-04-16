@@ -399,10 +399,22 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.spawn
     end
     
-    it "should generate and save instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
+    it "should assign instances of any belongs_to associations which are required by a presence_of validator for the association name" do
+      foo = Foo.create(:name => 'some foo')
+      Foo.stubs(:generate).returns(foo)
+      Frobnitz.spawn.foo.should == foo
+    end
+    
+    it "should generate instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
       thing = Thing.create(:name => 'some thing')
       Thing.expects(:generate).returns(thing)
       Frobnitz.spawn
+    end
+    
+    it "should assign instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
+      thing = Thing.create(:name => 'some thing')
+      Thing.stubs(:generate).returns(thing)
+      Frobnitz.spawn.thing.should == thing
     end
     
     it "should not generate instances of belongs_to associations which are not required by a presence_of validator" do

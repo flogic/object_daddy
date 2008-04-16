@@ -40,15 +40,9 @@ module ObjectDaddy
         req = {}
         (@presence_validated_attributes.keys - args.keys).each {|a| req[a.to_s] = true } # find attributes required by validates_presence_of not already set
         
-        # NOTE: This rigamarole ensures that requiring a belongs_to association by name will just do a normal generate while
-        # requiring the association by ID will do a generate-and-save (so that there is an ID).
-        # This probably actually needs to be changed to always do a generate-and-save
-        missing = {}
         belongs_to_associations = reflect_on_all_associations(:belongs_to).to_a
-        missing[:name] = belongs_to_associations.select { |a|  req[a.name.to_s] }
-        missing[:col]  = belongs_to_associations.select { |a|  req[a.primary_key_name.to_s] }
-        missing[:name].each {|a| args[a.name] = a.class_name.constantize.generate }
-        missing[:col].each {|a| args[a.name] = a.class_name.constantize.generate! }
+        missing = belongs_to_associations.select { |a|  req[a.name.to_s] or req[a.primary_key_name.to_s] }
+        missing.each {|a| args[a.name] = a.class_name.constantize.generate }
       end
       new(args)
     end
@@ -139,7 +133,7 @@ module ObjectDaddy
     end
     
     def generate!(args = {})
-      obj = generate(args)
+      obj = spawn(args)
       obj.save!
       obj
     end
