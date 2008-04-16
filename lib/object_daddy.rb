@@ -18,7 +18,7 @@ module ObjectDaddy
     protected :exemplars_generated=
     
     # create a valid instance of this class, using any known generators
-    def generate(args = {})
+    def spawn(args = {})
       gather_exemplars unless exemplars_generated
       (generators || {}).each_pair do |handle, gen_data|
         next if args[handle]
@@ -52,6 +52,7 @@ module ObjectDaddy
       end
       new(args)
     end
+    alias_method :generate, :spawn
 
     # register a generator for an attribute of this class
     # generator_for :foo do |prev| ... end

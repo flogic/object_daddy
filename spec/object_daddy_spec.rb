@@ -8,8 +8,8 @@ describe ObjectDaddy, "when included into a class" do
     @class.send(:include, ObjectDaddy)
   end
   
-  it "should provide a means of generating a class instance" do
-    @class.should respond_to(:generate)
+  it "should provide a means of spawning a class instance" do
+    @class.should respond_to(:spawn)
   end
   
   it "should provide a means of registering a generator to assist in creating class instances" do
@@ -141,7 +141,7 @@ describe ObjectDaddy, 'recording the registration of a generator method' do
   end
 end
 
-describe ObjectDaddy, "when generating a class instance" do
+describe ObjectDaddy, "when spawning a class instance" do
   before(:each) do
     @class = Class.new(OpenStruct)
     @class.send(:include, ObjectDaddy)
@@ -153,23 +153,23 @@ describe ObjectDaddy, "when generating a class instance" do
   
   it "should register exemplars for the target class on the first attempt" do
     @class.expects(:gather_exemplars)
-    @class.generate
+    @class.spawn
   end
   
   it "should not register exemplars for the target class after the first attempt" do
-    @class.generate
+    @class.spawn
     @class.expects(:gather_exemplars).never
-    @class.generate
+    @class.spawn
   end
 
   it "should look for exemplars for the target class in the standard exemplar path" do
     @class.expects(:exemplar_path).returns(@file_path)
-    @class.generate
+    @class.spawn
   end
   
   it "should look for an exemplar for the target class, based on the class's name" do
     @class.expects(:name).returns('Widget')
-    @class.generate
+    @class.spawn
   end
   
   it "should register any generators found in the exemplar for the target class" do 
@@ -180,7 +180,7 @@ describe ObjectDaddy, "when generating a class instance" do
       File.open(@file_name, 'w') {|f| f.puts "class Widget\ngenerator_for :foo\nend\n"}
       Widget.stubs(:exemplar_path).returns(@file_path)
       Widget.expects(:generator_for)
-      Widget.generate
+      Widget.spawn
     ensure
       # clean up test data file
       File.unlink(@file_name) if File.exists?(@file_name)
@@ -189,33 +189,33 @@ describe ObjectDaddy, "when generating a class instance" do
   
   it "should register no generators if no exemplar for the target class is available" do
     @class.expects(:generator_for).never
-    @class.generate
+    @class.spawn
   end
   
   it "should allow attributes to be overridden" do
-    @class.generate(:foo => 'xyzzy').foo.should == 'xyzzy'
+    @class.spawn(:foo => 'xyzzy').foo.should == 'xyzzy'
   end
   
   it "should use any generators registered with blocks" do
     @class.generator_for :foo do |prev| "foo"; end
-    @class.generate.foo.should == 'foo'
+    @class.spawn.foo.should == 'foo'
   end
   
   it "should not use a block generator for an attribute that has been overridden" do
     @class.generator_for :foo do |prev| "foo"; end
-    @class.generate(:foo => 'xyzzy').foo.should == 'xyzzy'    
+    @class.spawn(:foo => 'xyzzy').foo.should == 'xyzzy'
   end
   
   it "should use any generators registered with generator method names" do
     @class.stubs(:generator_method).returns('bar')
     @class.generator_for :foo, :method => :generator_method
-    @class.generate.foo.should == 'bar'
+    @class.spawn.foo.should == 'bar'
   end
   
   it "should not use a method generator for an attribute that has been overridden" do
     @class.stubs(:generator_method).returns('bar')
     @class.generator_for :foo, :method => :generator_method
-    @class.generate(:foo => 'xyzzy').foo.should == 'xyzzy'    
+    @class.spawn(:foo => 'xyzzy').foo.should == 'xyzzy'
   end
   
   it "should use any generators registered with generator classes" do
@@ -223,7 +223,7 @@ describe ObjectDaddy, "when generating a class instance" do
       def self.next() 'baz' end
     end
     @class.generator_for :foo, :class => @generator_class
-    @class.generate.foo.should == 'baz'
+    @class.spawn.foo.should == 'baz'
   end
 
   it "should not use a class generator for an attribute that has been overridden" do
@@ -231,53 +231,53 @@ describe ObjectDaddy, "when generating a class instance" do
       def self.next() 'baz' end
     end
     @class.generator_for :foo, :class => @generator_class
-    @class.generate(:foo => 'xyzzy').foo.should == 'xyzzy'    
+    @class.spawn(:foo => 'xyzzy').foo.should == 'xyzzy'
   end
   
   it "should return the initial value first if one was registered for a block generator" do
     @class.generator_for :foo, :start => 'frobnitz' do |prev| "foo"; end
-    @class.generate.foo.should == 'frobnitz'
+    @class.spawn.foo.should == 'frobnitz'
   end
   
   it "should return the block applied to the initial value on the second call if an initial value was registered for a block generator" do
     @class.generator_for :foo, :start => 'frobnitz' do |prev| prev.succ; end
-    @class.generate
-    @class.generate.foo.should == 'frobniua'
+    @class.spawn
+    @class.spawn.foo.should == 'frobniua'
   end
   
   it "should return the block applied to the previous value when repeatedly calling a block generator" do
     @class.generator_for :foo do |prev| prev ? prev.succ : 'test'; end
-    @class.generate
-    @class.generate.foo.should == 'tesu'
+    @class.spawn
+    @class.spawn.foo.should == 'tesu'
   end
   
   it 'should use the return value for a block generator that takes no argument' do
     x = 5
     @class.generator_for(:foo) { x }
-    @class.generate.foo.should == x
+    @class.spawn.foo.should == x
   end
   
-  it 'should use the return value for a block generator that specifically takes no argument' do
+  it 'should use the return value for a block generator that explicitly takes no argument' do
     x = 5
     @class.generator_for(:foo) { ||  x }
-    @class.generate.foo.should == x
+    @class.spawn.foo.should == x
   end
   
   it 'should use the supplied value for the generated value' do
     x = 5
     @class.generator_for :foo, x
-    @class.generate.foo.should == x
+    @class.spawn.foo.should == x
   end
   
   it 'should use the supplied attr => value value for the generated value' do
     x = 5
     @class.generator_for :foo => x
-    @class.generate.foo.should == x
+    @class.spawn.foo.should == x
   end
   
   it "should call the normal target class constructor" do
     @class.expects(:new)
-    @class.generate
+    @class.spawn
   end
   
   describe 'for a subclass' do
@@ -309,21 +309,21 @@ describe ObjectDaddy, "when generating a class instance" do
       end
       
       it 'should use generators from the parent class' do
-        SubWidget.generate.blah.should == 'blah'
+        SubWidget.spawn.blah.should == 'blah'
       end
       
       it 'should let subclass generators override parent generators' do
         File.open(@subfile_name, 'w') do |f|
           f.puts "class SubWidget\ngenerator_for :blah do |prev| 'blip'; end\nend\n"
         end
-        SubWidget.generate.blah.should == 'blip'
+        SubWidget.spawn.blah.should == 'blip'
       end
     end
     
     describe 'using generators called directly' do
       it 'should use generators from the parent class' do
         @class.generator_for :blah do |prev| 'blah'; end
-        @subclass.generate.blah.should == 'blah'
+        @subclass.spawn.blah.should == 'blah'
       end
       
       it 'should let subclass generators override parent generators' do
@@ -338,7 +338,7 @@ describe ObjectDaddy, "when generating a class instance" do
           # p @subclass.generators
           # p @subclass.generators[:blah][:generator][:block].call
           # @subclass.send(:gather_exemplars)
-          @subclass.generate.blah.should == 'blip'
+          @subclass.spawn.blah.should == 'blip'
         end
       end
     end
