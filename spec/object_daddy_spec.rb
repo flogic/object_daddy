@@ -436,19 +436,31 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     end
     
     it "should return an unsaved record if spawning" do
-      Frobnitz.spawn.should be_new_record
+      Thing.spawn.should be_new_record
     end
     
-    it "should fail if trying to generate and save an invalid object" do
+    it "should return a saved record if generating" do
+      Thing.generate.should_not be_new_record
+    end
+    
+    it 'should return a saved record if generating while raising exceptions' do
+      Thing.generate!.should_not be_new_record
+    end
+    
+    it "should not fail if trying to generate and save an invalid object" do
+      lambda { Frobnitz.generate(:title => 'bob') }.should_not raise_error(ActiveRecord::RecordInvalid)
+    end
+    
+    it "should return an invalid object if trying to generate and save an invalid object" do
+      Frobnitz.generate(:title => 'bob').should_not be_valid
+    end
+    
+    it "should fail if trying to generate and save an invalid object while raising acceptions" do
       lambda { Frobnitz.generate!(:title => 'bob') }.should raise_error(ActiveRecord::RecordInvalid)
     end
     
     it "should return a valid object if generate and save succeeds" do
-      Frobnitz.generate!(:title => '5', :name => 'blah').should be_valid
-    end
-    
-    it "should return a saved object if generate and save succeeds" do
-      Frobnitz.generate!(:title => '5', :name => 'blah').should_not be_new_record
+      Frobnitz.generate(:title => '5', :name => 'blah').should be_valid
     end
   end
 end
