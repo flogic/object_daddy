@@ -37,8 +37,8 @@ called to generate a valid instance object of that model class, for use in
 testing:
 
   it "should have a comment for every forum the user posts to" do
-    @user = User.generate.save
-    @post = Post.generate.save
+    @user = User.generate
+    @post = Post.generate
     @post.comments << Comment.generate
     @user.should have(1).comments
   end
@@ -64,7 +64,6 @@ end
 a call to User.generate will also make a call to Login.generate so that
 User#login is present, and therefore valid.
 
-
 If all models were able to be created in a valid form by the default Model.new
 call with no knowledge of the model itself, there'd be no need for Object
 Daddy. So, when we deal with models which have validity requirements,
@@ -76,7 +75,7 @@ specify, for a specific model attribute, how to make a valid value. Note that
 "validates_uniqueness_of" can require that, even if we make 100,000 instances
 of a model that unique attributes cannot have the same values.
 
-Object Daddy's :generator_for method can take three forms, corresponding to
+Object Daddy's generator_for method can take three main forms corresponding to
 the means of finding a value for the associated attribute: a block, a method
 call, or using a generator class.
 
@@ -110,8 +109,6 @@ class SSNGenerator
   end
 end
 
-
-
 Note that the block method of invocation (as used with :email above) takes an
 optional :start argument, to specify the value of that attribute on the first
 run. The block will be called thereafter with the previous value of the
@@ -123,6 +120,16 @@ called to generate a new value for the attribute in question.
 The :class form calls the .next class method on the named class to generate a
 new value for the attribute in question.
 
+The argument (previous value) to the block invocation form can be omitted if
+it's going to be ignored, and simple invocation forms are provided for literal
+values.
+
+class User < ActiveRecord::Base
+  generator_for(:start_time) { Time.now }
+  generator_for :name, 'Joe'
+  generator_for :age => 25
+end
+
 The developer would then simply call 'User.generate' when testing.
 
 If some attribute values are known (or are being controlled during testing)
@@ -130,6 +137,15 @@ then these can simply be passed in to .generate:
 
   @bad_login = Login.generate(:expiry => 1.week.ago)
   @expired_user = User.generate(:login => @bad_login)
+
+A .generate! method is also provided. The generate/generate! pair of methods
+can be thought of as analogs to create/create!, one merely providing an instance
+that may or may not be valid and the other raising an exception if any
+problem comes up.
+
+Finally, a .spawn method is provided that only gives a new, unsaved object. Note
+that this is the only method of the three that is available if you happen to be
+using Object Daddy outside of Rails.
 
 == Exemplars
 
@@ -176,3 +192,20 @@ end
 While Object Daddy is meant to obviate the hellish devilspawn that are test
 fixtures, Object Daddy should work alongside fixtures just fine. To each his
 own, I suppose.
+
+== Known Issues
+
+The simple invocation forms for generator_for when using literal values (as seen below)
+do not work if the literal value is a Hash. Don't do that.
+
+class User < ActiveRecord::Base
+  generator_for :name, 'Joe'
+  generator_for :age => 25
+end
+
+=== Rails 'surprises'
+
+Due to the way Rails handles associations, cascading generations (as a result of
+required associations) are always generated-and-saved, even if the original generation
+call was a mere spawn ('new'). This may come as a surprise, but it would probably be more
+of a surprise if User.spawn.save and User.generate weren't comparable.
