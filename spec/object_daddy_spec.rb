@@ -12,6 +12,14 @@ describe ObjectDaddy, "when included into a class" do
     @class.should respond_to(:spawn)
   end
   
+  it "should not provide a means of generating and saving a class instance" do
+    @class.should_not respond_to(:generate)
+  end
+  
+  it "should not provide a means of generating and saving a class instance while raising exceptions" do
+    @class.should_not respond_to(:generate!)
+  end
+  
   it "should provide a means of registering a generator to assist in creating class instances" do
     @class.should respond_to(:generator_for)
   end
@@ -374,6 +382,10 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
 
   describe ObjectDaddy, "when integrated with Rails" do
     it "should provide a means of generating and saving a class instance" do
+      Frobnitz.should respond_to(:generate)
+    end
+    
+    it "should provide a means of generating and saving a class instance while raising exceptions" do
       Frobnitz.should respond_to(:generate!)
     end
     

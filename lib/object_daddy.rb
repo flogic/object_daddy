@@ -52,7 +52,6 @@ module ObjectDaddy
       end
       new(args)
     end
-    alias_method :generate, :spawn
 
     # register a generator for an attribute of this class
     # generator_for :foo do |prev| ... end
@@ -131,6 +130,12 @@ module ObjectDaddy
       new_attr.pop if new_attr.last.is_a?(Hash)
       new_attr.each {|a| @presence_validated_attributes[a] = true }
       validates_presence_of_without_object_daddy(*attr_names)
+    end
+    
+    def generate(args = {})
+      obj = spawn(args)
+      obj.save
+      obj
     end
     
     def generate!(args = {})
