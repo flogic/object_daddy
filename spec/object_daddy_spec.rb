@@ -382,33 +382,34 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     end
     
     it "should generate instances of any belongs_to associations which are required by a presence_of validator for the association name" do
-      Foo.expects(:generate).returns(Foo.new)
-      Frobnitz.generate
+      foo = Foo.create(:name => 'some foo')
+      Foo.expects(:generate).returns(foo)
+      Frobnitz.spawn
     end
     
     it "should generate and save instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
       thing = Thing.create(:name => 'some thing')
-      Thing.expects(:generate!).returns(thing)
-      Frobnitz.generate
+      Thing.expects(:generate).returns(thing)
+      Frobnitz.spawn
     end
     
     it "should not generate instances of belongs_to associations which are not required by a presence_of validator" do
       Bar.expects(:generate).never
-      Frobnitz.generate
+      Frobnitz.spawn
     end
     
     it "should not generate any values for attributes that do not have generators" do
-      Frobnitz.generate.name.should be_nil
+      Frobnitz.spawn.name.should be_nil
     end
 
     it "should use specified values for attributes that do not have generators" do
-      Frobnitz.generate(:name => 'test').name.should == 'test'
+      Frobnitz.spawn(:name => 'test').name.should == 'test'
     end
     
     it "should use specified values for attributes that would otherwise be generated" do
       Foo.expects(:generate).never
       foo = Foo.new
-      Frobnitz.generate(:foo => foo).foo.should == foo
+      Frobnitz.spawn(:foo => foo).foo.should == foo
     end
     
     # NOTE: This could be better with validation reflection
@@ -422,8 +423,8 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.should have(4).presence_validated_attributes
     end
     
-    it "should return an unsaved record if generating" do
-      Frobnitz.generate.should be_new_record
+    it "should return an unsaved record if spawning" do
+      Frobnitz.spawn.should be_new_record
     end
     
     it "should fail if trying to generate and save an invalid object" do
