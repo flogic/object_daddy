@@ -17,7 +17,6 @@ describe ObjectDaddy, "when included into a class" do
   end
 end
 
-
 describe ObjectDaddy, "when registering a generator method" do
   before(:each) do
     @class = Class.new(OpenStruct)
@@ -412,6 +411,7 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.generate(:foo => foo).foo.should == foo
     end
     
+    # NOTE: This could be better with validation reflection
     it 'should pass the supplied validator options to the real validator method' do
       Blah.expects(:validates_presence_of_without_object_daddy).with(:bam, :if => :make_it_so)
       Blah.validates_presence_of :bam, :if => :make_it_so
