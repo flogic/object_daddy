@@ -19,7 +19,7 @@ module ObjectDaddy
     
     # create a valid instance of this class, using any known generators
     def spawn(args = {})
-      gather_exemplars unless exemplars_generated
+      gather_exemplars
       (generators || {}).each_pair do |handle, gen_data|
         next if args[handle]
         generator = gen_data[:generator]
@@ -88,9 +88,8 @@ module ObjectDaddy
       end
     end
     
-  protected
-    
     def gather_exemplars
+      return if exemplars_generated
       if superclass.respond_to?(:gather_exemplars)
         superclass.gather_exemplars
         self.generators = (superclass.generators || {}).dup
@@ -100,7 +99,9 @@ module ObjectDaddy
       load(path) if File.exists?(path)
       self.exemplars_generated = true
     end
-    
+  
+  protected
+  
     # we define an underscore helper ourselves since the ActiveSupport isn't available if we're not using Rails
     def underscore(string)
       string.gsub(/([a-z])([A-Z])/, '\1_\2').downcase

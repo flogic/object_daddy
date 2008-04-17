@@ -148,6 +148,95 @@ describe ObjectDaddy, 'recording the registration of a generator method' do
   end
 end
 
+describe ObjectDaddy, 'when registering exemplars' do
+  before :each do
+    @class = Class.new(OpenStruct)
+    @class.send(:include, ObjectDaddy)
+    @file_path = File.join(File.dirname(__FILE__), 'tmp')
+    @file_name = File.join(@file_path, 'widget_exemplar.rb')
+    @class.stubs(:exemplar_path).returns(@file_path)
+    @class.stubs(:name).returns('Widget')
+  end
+  
+  describe 'before exemplars have been registered' do
+    before :each do
+      @class.stubs(:exemplars_generated).returns(false)
+    end
+    
+    it "should look for exemplars for the target class in the standard exemplar path" do
+      @class.expects(:exemplar_path).returns(@file_path)
+      @class.gather_exemplars
+    end
+    
+    it "should look for an exemplar for the target class, based on the class's name" do
+      @class.expects(:name).returns('Widget')
+      @class.gather_exemplars
+    end
+    
+    it "should register any generators found in the exemplar for the target class" do 
+      # we are using the concrete Widget class here because otherwise it's difficult to have our exemplar file work in our class
+      begin
+        # a dummy class, useful for testing the actual loading of exemplar files
+        Widget = Class.new(OpenStruct) { include ObjectDaddy }
+        File.open(@file_name, 'w') {|f| f.puts "class Widget\ngenerator_for :foo\nend\n"}
+        Widget.stubs(:exemplar_path).returns(@file_path)
+        Widget.expects(:generator_for)
+        Widget.gather_exemplars
+      ensure
+        # clean up test data file
+        File.unlink(@file_name) if File.exists?(@file_name)
+      end
+    end
+    
+    it 'should record that exemplars have been registered' do
+      @class.expects(:exemplars_generated=).with(true)
+      @class.gather_exemplars
+    end
+  end
+  
+  describe 'after exemplars have been registered' do
+    before :each do
+      @class.stubs(:exemplars_generated).returns(true)
+    end
+    
+    it "should not look for exemplars for the target class in the standard exemplar path" do
+      @class.expects(:exemplar_path).never
+      @class.gather_exemplars
+    end
+    
+    it "should not look for an exemplar for the target class, based on the class's name" do
+      @class.expects(:name).never
+      @class.gather_exemplars
+    end
+    
+    it 'should register no generators' do
+      # we are using the concrete Widget class here because otherwise it's difficult to have our exemplar file work in our class
+      begin
+        # a dummy class, useful for testing the actual loading of exemplar files
+        Widget = Class.new(OpenStruct) { include ObjectDaddy }
+        File.open(@file_name, 'w') {|f| f.puts "class Widget\ngenerator_for :foo\nend\n"}
+        Widget.stubs(:exemplar_path).returns(@file_path)
+        Widget.stubs(:exemplars_generated).returns(true)
+        Widget.expects(:generator_for).never
+        Widget.gather_exemplars
+      ensure
+        # clean up test data file
+        File.unlink(@file_name) if File.exists?(@file_name)
+      end
+    end
+    
+    it 'should not record that exemplars have been registered' do
+      @class.expects(:exemplars_generated=).never
+      @class.gather_exemplars
+    end
+  end
+  
+  it "should register no generators if no exemplar for the target class is available" do
+    @class.expects(:generator_for).never
+    @class.gather_exemplars
+  end
+end
+
 describe ObjectDaddy, "when spawning a class instance" do
   before(:each) do
     @class = Class.new(OpenStruct)
@@ -158,44 +247,8 @@ describe ObjectDaddy, "when spawning a class instance" do
     @class.stubs(:name).returns('Widget')
   end
   
-  it "should register exemplars for the target class on the first attempt" do
+  it "should register exemplars for the target class" do
     @class.expects(:gather_exemplars)
-    @class.spawn
-  end
-  
-  it "should not register exemplars for the target class after the first attempt" do
-    @class.spawn
-    @class.expects(:gather_exemplars).never
-    @class.spawn
-  end
-
-  it "should look for exemplars for the target class in the standard exemplar path" do
-    @class.expects(:exemplar_path).returns(@file_path)
-    @class.spawn
-  end
-  
-  it "should look for an exemplar for the target class, based on the class's name" do
-    @class.expects(:name).returns('Widget')
-    @class.spawn
-  end
-  
-  it "should register any generators found in the exemplar for the target class" do 
-    # we are using the concrete Widget class here because otherwise it's difficult to have our exemplar file work in our class
-    begin
-      # a dummy class, useful for testing the actual loading of exemplar files
-      Widget = Class.new(OpenStruct) { include ObjectDaddy }
-      File.open(@file_name, 'w') {|f| f.puts "class Widget\ngenerator_for :foo\nend\n"}
-      Widget.stubs(:exemplar_path).returns(@file_path)
-      Widget.expects(:generator_for)
-      Widget.spawn
-    ensure
-      # clean up test data file
-      File.unlink(@file_name) if File.exists?(@file_name)
-    end
-  end
-  
-  it "should register no generators if no exemplar for the target class is available" do
-    @class.expects(:generator_for).never
     @class.spawn
   end
   
