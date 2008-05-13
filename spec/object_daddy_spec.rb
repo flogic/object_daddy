@@ -411,12 +411,14 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
   setup_rails_database
 
   class Foo < ActiveRecord::Base
+    has_many :frobnitzes, :class_name => 'Frobnitz'
   end
   
   class Bar < ActiveRecord::Base
   end
   
   class Thing < ActiveRecord::Base
+    has_many :frobnitzes, :class_name => 'Frobnitz'
   end
 
   class Frobnitz < ActiveRecord::Base
@@ -473,6 +475,18 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     it "should not generate instances of belongs_to associations which are not required by a presence_of validator" do
       Bar.expects(:generate).never
       Frobnitz.spawn
+    end
+    
+    it 'should use the parent object when generating an instance through a has_many association and requiring primary key name' do
+      thing = Thing.create(:name => 'some thing')
+      frob  = thing.frobnitzes.generate
+      frob.thing.should == thing
+    end
+    
+    it 'should use the parent object when generating an instance through a has_many association and requiring object' do
+      foo  = Foo.create(:name => 'some foo')
+      frob = foo.frobnitzes.generate
+      frob.foo.should == foo
     end
     
     it "should not generate any values for attributes that do not have generators" do
