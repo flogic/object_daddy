@@ -1,5 +1,5 @@
 = Object Daddy
-<b>Version 0.0.1 (Nov 25, 2007)</b>
+<b>Version 0.2.2 (May 13, 2008)</b>
 
 Author::	Rick Bradley (mailto:blogicx@rickbradley.com), Yossef Mendelssohn (ymendel@pobox.com)
 Copyright::	Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
@@ -9,20 +9,20 @@ Object Daddy is a library (as well as a Ruby on Rails plugin) designed to
 assist in automating testing of large collections of objects, especially webs
 of ActiveRecord models. It is a descendant of the "Object Mother" pattern for
 creating objects for testing, and is related to the concept of an object
-Exemplar or "stereotype".
+exemplar or "stereotype".
 
 WARNING: This code is very much at an "alpha" development stage. Usage, APIs,
 etc., are all subject to change.
 
-TODO: put linkage into b.logi.cx post about the history.
+See http://b.logi.cx/2007/11/26/object-daddy for inspiration, historical drama, and too much reading.
 
 == Installation
 
-Unpack the object_daddy directory into vendor/rails/ in your rails project.
-Run the object_daddy/install.rb Ruby script. A definitive public revision
-control access point is forthcoming that will make it possible to install the
-plugin via script/plugin install, which will automatically run the
-installation hook.
+1. Unpack the object_daddy directory into vendor/rails/ in your rails project.
+2. Run the object_daddy/install.rb Ruby script.
+
+A. Or, as an alternative and assuming your script/plugin has git support, 
+   script/plugin install git://github.com/flogic/object_daddy.git
 
 == Testing
 
@@ -202,6 +202,28 @@ class User < ActiveRecord::Base
   generator_for :name, 'Joe'
   generator_for :age => 25
 end
+
+
+Required belongs_to associations are automatically generated when generating an instance,
+but only if necessary.
+
+class Category < ActiveRecord::Base
+  has_many :items
+end
+
+class Item < ActiveRecord::Base
+  belongs_to :category
+  validates_presence_of :category
+end
+
+Item.generate will generate a new category, but some_category.items.generate will not.
+Unless, of course, you are foolish enough to define a generator in the exemplar.
+
+class Item
+  generator_for(:category) { Category.generate }
+end
+
+Once again, don't do that.
 
 === Rails 'surprises'
 
