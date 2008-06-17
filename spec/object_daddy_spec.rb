@@ -185,6 +185,7 @@ describe ObjectDaddy, 'when registering exemplars' do
       ensure
         # clean up test data file
         File.unlink(@file_name) if File.exists?(@file_name)
+        Object.send(:remove_const, :Widget)
       end
     end
     
@@ -222,6 +223,7 @@ describe ObjectDaddy, 'when registering exemplars' do
       ensure
         # clean up test data file
         File.unlink(@file_name) if File.exists?(@file_name)
+        Object.send(:remove_const, :Widget)
       end
     end
     
@@ -352,7 +354,6 @@ describe ObjectDaddy, "when spawning a class instance" do
     
     describe 'using generators from files' do
       before :each do
-        # FIXME: get rid of 'already initialized constant' warnings
         Widget = Class.new(OpenStruct) { include ObjectDaddy }
         SubWidget = Class.new(Widget)  { include ObjectDaddy }
         
@@ -366,6 +367,7 @@ describe ObjectDaddy, "when spawning a class instance" do
       
       after :each do
         [@file_name, @subfile_name].each { |file|  File.unlink(file) if File.exists?(file) }
+        [:Widget, :SubWidget].each { |const|  Object.send(:remove_const, const) }
       end
       
       it 'should use generators from the parent class' do
