@@ -531,9 +531,8 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Blah.new.should be_valid
     end
     
-    # what is this testing?
     it "should ignore optional arguments to presence_of validators" do
-      Frobnitz.should have(4).presence_validated_attributes
+      Frobnitz.presence_validated_attributes.should include(:title)
     end
     
     it "should return an unsaved record if spawning" do

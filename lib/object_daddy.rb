@@ -102,7 +102,16 @@ module ObjectDaddy
       load(path) if File.exists?(path)
       self.exemplars_generated = true
     end
-  
+    
+    def presence_validated_attributes
+      @presence_validated_attributes ||= {}
+      attrs = @presence_validated_attributes
+      if superclass.respond_to?(:presence_validated_attributes)
+        attrs = superclass.presence_validated_attributes.merge(attrs)
+      end
+      attrs
+    end
+    
   protected
   
     # we define an underscore helper ourselves since the ActiveSupport isn't available if we're not using Rails
@@ -114,15 +123,6 @@ module ObjectDaddy
       self.generators ||= {}
       raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if (generators[handle] || {})[:source] == self
       generators[handle] = { :generator => generator, :source => self }
-    end
-    
-    def presence_validated_attributes
-      @presence_validated_attributes ||= {}
-      attrs = @presence_validated_attributes
-      if superclass.respond_to?(:presence_validated_attributes)
-        attrs = superclass.presence_validated_attributes.merge(attrs)
-      end
-      attrs
     end
   end
   
