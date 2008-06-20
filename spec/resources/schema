@@ -17,4 +17,8 @@ ActiveRecord::Schema.define(:version => 0) do
   create_table :things, :force => true do |t|
     t.column :name, :string
   end
+  
+  create_table :blahs, :force => true do |t|
+    t.column :bam, :string
+  end
 end
