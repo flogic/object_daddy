@@ -434,6 +434,9 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     validates_format_of   :title, :with => /^\d+$/
   end
   
+  class SubFrobnitz < Frobnitz
+  end
+  
   class Blah < ActiveRecord::Base
   end
 
@@ -472,6 +475,12 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       thing = Thing.create(:name => 'some thing')
       Thing.stubs(:generate).returns(thing)
       Frobnitz.spawn.thing.should == thing
+    end
+    
+    it 'should handle a belongs_to association required through inheritance' do
+      thing = Thing.create(:name => 'some thing')
+      Thing.expects(:generate).returns(thing)
+      SubFrobnitz.spawn
     end
     
     it "should not generate instances of belongs_to associations which are not required by a presence_of validator" do

@@ -36,9 +36,9 @@ module ObjectDaddy
           args[handle] = generator[:class].next
         end
       end
-      if presence_validated_attributes
+      if presence_validated_attributes and !presence_validated_attributes.empty?
         req = {}
-        (@presence_validated_attributes.keys - args.keys).each {|a| req[a.to_s] = true } # find attributes required by validates_presence_of not already set
+        (presence_validated_attributes.keys - args.keys).each {|a| req[a.to_s] = true } # find attributes required by validates_presence_of not already set
         
         belongs_to_associations = reflect_on_all_associations(:belongs_to).to_a
         missing = belongs_to_associations.select { |a|  req[a.name.to_s] or req[a.primary_key_name.to_s] }
@@ -114,6 +114,15 @@ module ObjectDaddy
       self.generators ||= {}
       raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if (generators[handle] || {})[:source] == self
       generators[handle] = { :generator => generator, :source => self }
+    end
+    
+    def presence_validated_attributes
+      @presence_validated_attributes ||= {}
+      attrs = @presence_validated_attributes
+      if superclass.respond_to?(:presence_validated_attributes)
+        attrs = superclass.presence_validated_attributes.merge(attrs)
+      end
+      attrs
     end
   end
   
