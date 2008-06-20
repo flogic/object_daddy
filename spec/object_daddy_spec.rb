@@ -435,6 +435,7 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
   end
   
   class SubFrobnitz < Frobnitz
+    validates_presence_of :bar
   end
   
   class Blah < ActiveRecord::Base
@@ -481,6 +482,17 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       thing = Thing.create(:name => 'some thing')
       Thing.expects(:generate).returns(thing)
       SubFrobnitz.spawn
+    end
+    
+    it 'should include belongs_to associations required by the subclass' do
+      bar = Bar.create
+      Bar.expects(:generate).returns(bar)
+      SubFrobnitz.spawn
+    end
+    
+    it 'should include belongs_to associations required by the subclass at the parent class level' do
+      Bar.expects(:generate).never
+      Frobnitz.spawn
     end
     
     it "should not generate instances of belongs_to associations which are not required by a presence_of validator" do
