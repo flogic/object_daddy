@@ -195,13 +195,15 @@ own, I suppose.
 
 == Known Issues
 
-The simple invocation forms for generator_for when using literal values (as seen below)
-do not work if the literal value is a Hash. Don't do that.
+The simple invocation forms for generator_for when using literal values do not 
+work if the literal value is a Hash. Don't do that.
 
 class User < ActiveRecord::Base
-  generator_for :name, 'Joe'
-  generator_for :age => 25
+  generator_for :thing_hash, { 'some key' => 'some value' }
+  generator_for :other_hash => { 'other key' => 'other value' }
 end
+
+I'm not sure why this would even ever come up, but seriously, don't.
 
 
 Required belongs_to associations are automatically generated when generating an instance,
