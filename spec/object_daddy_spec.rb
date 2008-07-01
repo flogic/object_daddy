@@ -490,7 +490,7 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       SubFrobnitz.spawn
     end
     
-    it 'should include belongs_to associations required by the subclass at the parent class level' do
+    it 'should not include belongs_to associations required by the subclass at the parent class level' do
       Bar.expects(:generate).never
       Frobnitz.spawn
     end
