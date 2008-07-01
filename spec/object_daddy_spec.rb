@@ -461,52 +461,68 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.exemplar_path.should == File.join(RAILS_ROOT, 'test', 'exemplars')
     end
     
-    it "should generate instances of any belongs_to associations which are required by a presence_of validator for the association name" do
-      foo = Foo.create(:name => 'some foo')
-      Foo.expects(:generate).returns(foo)
-      Frobnitz.spawn
+    describe 'when an association is required by name' do
+      it 'should generate an instance for the association' do
+        foo = Foo.create(:name => 'some foo')
+        Foo.expects(:generate).returns(foo)
+        Frobnitz.spawn
+      end
+      
+      it 'should assign an instance for the association' do
+        foo = Foo.create(:name => 'some foo')
+        Foo.stubs(:generate).returns(foo)
+        Frobnitz.spawn.foo.should == foo
+      end
+      
+      it 'should generate an instance for the association using specified foreign key and class name values' do
+        ya_model = YaModel.create(:name => 'ya model')
+        YaModel.expects(:generate).returns(ya_model)
+        Frobnitz.spawn
+      end
+      
+      it 'should assign an instance for the association using specified foreign key and class name values' do
+        ya_model = YaModel.create(:name => 'ya model')
+        YaModel.stubs(:generate).returns(ya_model)
+        Frobnitz.spawn.blotto.should == ya_model
+      end
+      
+      it 'should use the parent object when generating an instance through a has_many association' do
+        foo  = Foo.create(:name => 'some foo')
+        frob = foo.frobnitzes.generate
+        frob.foo.should == foo
+      end
     end
     
-    it "should assign instances of any belongs_to associations which are required by a presence_of validator for the association name" do
-      foo = Foo.create(:name => 'some foo')
-      Foo.stubs(:generate).returns(foo)
-      Frobnitz.spawn.foo.should == foo
-    end
-    
-    it "should generate instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
-      thing = Thing.create(:name => 'some thing')
-      Thing.expects(:generate).returns(thing)
-      Frobnitz.spawn
-    end
-    
-    it "should assign instances of any belongs_to associations which are required by a presence_of validator for the association ID" do
-      thing = Thing.create(:name => 'some thing')
-      Thing.stubs(:generate).returns(thing)
-      Frobnitz.spawn.thing.should == thing
-    end
-    
-    it "should generate instances of any belongs_to associations with a non-default foreign key which are required by a presence_of validator for the association ID" do
-      ya_model = YaModel.create(:name => 'ya model')
-      YaModel.expects(:generate).returns(ya_model)
-      Frobnitz.spawn
-    end
-    
-    it "should assign instances of any belongs_to associations with a non-default foreign key which are required by a presence_of validator for the association name" do
-      ya_model = YaModel.create(:name => 'ya model')
-      YaModel.stubs(:generate).returns(ya_model)
-      Frobnitz.spawn.blotto.should == ya_model
-    end
-    
-    it "should generate instances of any belongs_to associations with a non-default foreign key which are required by a presence_of validator for the association name" do
-      blah = Blah.create(:bam => 'blah')
-      Blah.expects(:generate).returns(blah)
-      Frobnitz.spawn
-    end
-    
-    it "should assign instances of any belongs_to associations with a non-default foreign key which are required by a presence_of validator for the association ID" do
-      blah = Blah.create(:bam => 'blah')
-      Blah.stubs(:generate).returns(blah)
-      Frobnitz.spawn.bango.should == blah
+    describe 'when an association is required by ID' do
+      it 'should generate an instance for the association' do
+        thing = Thing.create(:name => 'some thing')
+        Thing.expects(:generate).returns(thing)
+        Frobnitz.spawn
+      end
+      
+      it 'should assign an instance for the association' do
+        thing = Thing.create(:name => 'some thing')
+        Thing.stubs(:generate).returns(thing)
+        Frobnitz.spawn.thing.should == thing
+      end
+      
+      it 'should generate an instance for the association using specified foreign key and class name values' do
+        blah = Blah.create(:bam => 'blah')
+        Blah.expects(:generate).returns(blah)
+        Frobnitz.spawn
+      end
+      
+      it 'should assign an instance for the association using specified foreign key and class name values' do
+        blah = Blah.create(:bam => 'blah')
+        Blah.stubs(:generate).returns(blah)
+        Frobnitz.spawn.bango.should == blah
+      end
+      
+      it 'should use the parent object when generating an instance through a has_many association' do
+        thing = Thing.create(:name => 'some thing')
+        frob  = thing.frobnitzes.generate
+        frob.thing.should == thing
+      end
     end
     
     it 'should handle a belongs_to association required through inheritance' do
@@ -529,18 +545,6 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     it "should not generate instances of belongs_to associations which are not required by a presence_of validator" do
       Bar.expects(:generate).never
       Frobnitz.spawn
-    end
-    
-    it 'should use the parent object when generating an instance through a has_many association and requiring primary key name' do
-      thing = Thing.create(:name => 'some thing')
-      frob  = thing.frobnitzes.generate
-      frob.thing.should == thing
-    end
-    
-    it 'should use the parent object when generating an instance through a has_many association and requiring object' do
-      foo  = Foo.create(:name => 'some foo')
-      frob = foo.frobnitzes.generate
-      frob.foo.should == foo
     end
     
     it "should not generate any values for attributes that do not have generators" do
