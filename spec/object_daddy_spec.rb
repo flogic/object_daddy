@@ -427,8 +427,12 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     belongs_to :foo
     belongs_to :bar
     belongs_to :thing
+    belongs_to :bango, :class_name => 'Blah', :foreign_key => 'bangbang_id'
+    belongs_to :blotto, :class_name => 'YaModel', :foreign_key => 'blitblot_id'
     validates_presence_of :foo
     validates_presence_of :thing_id
+    validates_presence_of :bangbang_id
+    validates_presence_of :blotto
     validates_presence_of :name
     validates_presence_of :title, :on => :create, :message => "can't be blank"
     validates_format_of   :title, :with => /^\d+$/
@@ -439,6 +443,9 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
   end
   
   class Blah < ActiveRecord::Base
+  end
+  
+  class YaModel < ActiveRecord::Base
   end
 
   describe ObjectDaddy, "when integrated with Rails" do
@@ -476,6 +483,30 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       thing = Thing.create(:name => 'some thing')
       Thing.stubs(:generate).returns(thing)
       Frobnitz.spawn.thing.should == thing
+    end
+    
+    it "should generate instances of any belongs_to associations with a non-default foreign key which are required by a presence_of validator for the association ID" do
+      ya_model = YaModel.create(:name => 'ya model')
+      YaModel.expects(:generate).returns(ya_model)
+      Frobnitz.spawn
+    end
+    
+    it "should assign instances of any belongs_to associations with a non-default foreign key which are required by a presence_of validator for the association name" do
+      ya_model = YaModel.create(:name => 'ya model')
+      YaModel.stubs(:generate).returns(ya_model)
+      Frobnitz.spawn.blotto.should == ya_model
+    end
+    
+    it "should generate instances of any belongs_to associations with a non-default foreign key which are required by a presence_of validator for the association name" do
+      blah = Blah.create(:bam => 'blah')
+      Blah.expects(:generate).returns(blah)
+      Frobnitz.spawn
+    end
+    
+    it "should assign instances of any belongs_to associations with a non-default foreign key which are required by a presence_of validator for the association ID" do
+      blah = Blah.create(:bam => 'blah')
+      Blah.stubs(:generate).returns(blah)
+      Frobnitz.spawn.bango.should == blah
     end
     
     it 'should handle a belongs_to association required through inheritance' do
