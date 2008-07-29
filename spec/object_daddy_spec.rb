@@ -88,8 +88,8 @@ describe ObjectDaddy, "when registering a generator method" do
     lambda { @class.generator_for :foo, :method => :method_name }.should_not raise_error    
   end
   
-  it "should fail if a non-existent generator method name is provided" do
-    lambda { @class.generator_for :foo, :method => :fake_method }.should raise_error(ArgumentError)
+  it "should not fail if a non-existent generator method name is provided" do
+    lambda { @class.generator_for :foo, :method => :fake_method }.should_not raise_error(ArgumentError)
   end
   
   it 'should succeed if a value is provided' do
@@ -272,6 +272,11 @@ describe ObjectDaddy, "when spawning a class instance" do
     @class.stubs(:generator_method).returns('bar')
     @class.generator_for :foo, :method => :generator_method
     @class.spawn.foo.should == 'bar'
+  end
+  
+  it 'should fail if a generator is registered with a non-existent method name' do
+    @class.generator_for :foo, :method => :nonexistent_metho
+    lambda { @class.spawn.foo }.should raise_error
   end
   
   it "should not use a method generator for an attribute that has been overridden" do

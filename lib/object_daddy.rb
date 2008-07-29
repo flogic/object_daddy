@@ -76,7 +76,6 @@ module ObjectDaddy
       end
       
       if args[:method]
-        raise ArgumentError, "generator method :[#{args[:method]}] is not known" unless respond_to?(args[:method].to_sym)
         record_generator_for(handle, :method => args[:method].to_sym)
       elsif args[:class]
         raise ArgumentError, "generator class [#{args[:class].name}] does not have a :next method" unless args[:class].respond_to?(:next)
