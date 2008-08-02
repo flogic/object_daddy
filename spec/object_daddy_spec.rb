@@ -347,6 +347,16 @@ describe ObjectDaddy, "when spawning a class instance" do
     @class.spawn
   end
   
+  it 'should not generate a value for an attribute that has been specified as nil' do
+    @class.generator_for :foo => 5
+    @class.spawn(:foo => nil).foo.should be_nil
+  end
+  
+  it 'should not generate a value for an attribute that has been specified as false' do
+    @class.generator_for :foo => 5
+    @class.spawn(:foo => false).foo.should be(false)
+  end
+  
   describe 'for a subclass' do
     before :each do
       @subclass = Class.new(@class)

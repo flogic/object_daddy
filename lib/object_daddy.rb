@@ -21,7 +21,7 @@ module ObjectDaddy
     def spawn(args = {})
       gather_exemplars
       (generators || {}).each_pair do |handle, gen_data|
-        next if args[handle]
+        next if args.include?(handle)
         generator = gen_data[:generator]
         if generator[:block]
           if generator[:start]
