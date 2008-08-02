@@ -506,6 +506,15 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
         frob = foo.frobnitzes.generate
         frob.foo.should == foo
       end
+      
+      it 'should not generate an instance if the attribute is overridden by nil' do
+        Foo.expects(:generate).never
+        Frobnitz.spawn(:foo => nil)
+      end
+      
+      it 'should not assign an instance if the attribute is overridden by nil' do
+        Frobnitz.spawn(:foo => nil).foo.should be_nil
+      end
     end
     
     describe 'when an association is required by ID' do
@@ -537,6 +546,15 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
         thing = Thing.create(:name => 'some thing')
         frob  = thing.frobnitzes.generate
         frob.thing.should == thing
+      end
+      
+      it 'should not generate an instance if the attribute is overridden by nil' do
+        Thing.expects(:generate).never
+        Frobnitz.spawn(:thing_id => nil)
+      end
+      
+      it 'should not assign an instance if the attribute is overridden by nil' do
+        Frobnitz.spawn(:thing_id => nil).thing.should be_nil
       end
     end
     
