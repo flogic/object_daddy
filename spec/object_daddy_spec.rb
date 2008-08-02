@@ -472,8 +472,31 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.should respond_to(:generate!)
     end
     
-    it "should base the exemplar path off RAILS_ROOT for ActiveRecord models" do
-      Frobnitz.exemplar_path.should == File.join(RAILS_ROOT, 'test', 'exemplars')
+    describe 'giving an exemplar path for an ActiveRecord model' do
+      it 'should check if a spec directory exists' do
+        File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec'))
+        Frobnitz.exemplar_path
+      end
+      
+      describe 'if a spec directory exists' do
+        before :each do
+          File.stubs(:directory?).returns(true)
+        end
+        
+        it 'should use the spec directory' do
+          Frobnitz.exemplar_path.should == File.join(RAILS_ROOT, 'spec', 'exemplars')
+        end
+      end
+      
+      describe 'if a spec directory does not exist' do
+        before :each do
+          File.stubs(:directory?).returns(false)
+        end
+        
+        it 'should use the test directory' do
+          Frobnitz.exemplar_path.should == File.join(RAILS_ROOT, 'test', 'exemplars')
+        end
+      end
     end
     
     describe 'when an association is required by name' do
