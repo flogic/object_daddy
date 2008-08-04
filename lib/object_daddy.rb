@@ -20,32 +20,8 @@ module ObjectDaddy
     # create a valid instance of this class, using any known generators
     def spawn(args = {})
       gather_exemplars
-      (generators || {}).each_pair do |handle, gen_data|
-        next if args.include?(handle)
-        generator = gen_data[:generator]
-        if generator[:block]
-          if generator[:start]
-            generator[:prev] = args[handle] = generator[:start]
-            generator.delete(:start)
-          else
-            generator[:prev] = args[handle] = generator[:block].call(generator[:prev])
-          end
-        elsif generator[:method]
-          method = method(generator[:method])
-          if method.arity == 1
-            if generator[:start]
-              generator[:prev] = args[handle] = generator[:start]
-              generator.delete(:start)
-            else
-              generator[:prev] = args[handle] = method.call(generator[:prev])
-            end
-          else
-            args[handle] = method.call
-          end
-        elsif generator[:class]
-          args[handle] = generator[:class].next
-        end
-      end
+      generate_values(args)
+      
       if presence_validated_attributes and !presence_validated_attributes.empty?
         req = {}
         (presence_validated_attributes.keys - args.keys).each {|a| req[a.to_s] = true } # find attributes required by validates_presence_of not already set
@@ -134,6 +110,37 @@ module ObjectDaddy
       self.generators ||= {}
       raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if (generators[handle] || {})[:source] == self
       generators[handle] = { :generator => generator, :source => self }
+    end
+  
+  private
+    
+    def generate_values(args)
+      (generators || {}).each_pair do |handle, gen_data|
+        next if args.include?(handle)
+        generator = gen_data[:generator]
+        if generator[:block]
+          if generator[:start]
+            generator[:prev] = args[handle] = generator[:start]
+            generator.delete(:start)
+          else
+            generator[:prev] = args[handle] = generator[:block].call(generator[:prev])
+          end
+        elsif generator[:method]
+          method = method(generator[:method])
+          if method.arity == 1
+            if generator[:start]
+              generator[:prev] = args[handle] = generator[:start]
+              generator.delete(:start)
+            else
+              generator[:prev] = args[handle] = method.call(generator[:prev])
+            end
+          else
+            args[handle] = method.call
+          end
+        elsif generator[:class]
+          args[handle] = generator[:class].next
+        end
+      end
     end
   end
   
