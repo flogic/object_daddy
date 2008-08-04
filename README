@@ -1,5 +1,5 @@
 = Object Daddy
-<b>Version 0.2.4 (August 2, 2008)</b>
+<b>Version 0.2.5 (August 3, 2008)</b>
 
 Author::	Rick Bradley (mailto:blogicx@rickbradley.com), Yossef Mendelssohn (ymendel@pobox.com)
 Copyright::	Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
@@ -115,7 +115,9 @@ run. The block will be called thereafter with the previous value of the
 attribute and will generate the next attribute value to be used.
 
 The :method form takes a symbol naming a class method in the model class to be
-called to generate a new value for the attribute in question.
+called to generate a new value for the attribute in question. If the method 
+takes a single argument, it will act much like the block method of invocation,
+being called with the previous value and generating the next.
 
 The :class form calls the .next class method on the named class to generate a
 new value for the attribute in question.
