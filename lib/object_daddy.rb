@@ -126,11 +126,12 @@ module ObjectDaddy
     
     def process_generated_value(args, handle, generator, block)
       if generator[:start]
-        generator[:prev] = args[handle] = generator[:start]
+        value = generator[:start]
         generator.delete(:start)
       else
-        generator[:prev] = args[handle] = block.call(generator[:prev])
+        value = block.call(generator[:prev])
       end
+      generator[:prev] = args[handle] = value
     end
     
     def generate_missing(args)
