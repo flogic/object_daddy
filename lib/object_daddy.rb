@@ -21,18 +21,6 @@ module ObjectDaddy
     def spawn(args = {})
       gather_exemplars
       generate_values(args)
-      
-      if presence_validated_attributes and !presence_validated_attributes.empty?
-        req = {}
-        (presence_validated_attributes.keys - args.keys).each {|a| req[a.to_s] = true } # find attributes required by validates_presence_of not already set
-        
-        belongs_to_associations = reflect_on_all_associations(:belongs_to).to_a
-        missing = belongs_to_associations.select { |a|  req[a.name.to_s] or req[a.primary_key_name.to_s] }
-        if create_scope = scope(:create)
-          missing.reject! { |a|   create_scope.include?(a.primary_key_name) }
-        end
-        missing.each {|a| args[a.name] = a.class_name.constantize.generate }
-      end
       new(args)
     end
 
@@ -140,6 +128,22 @@ module ObjectDaddy
         elsif generator[:class]
           args[handle] = generator[:class].next
         end
+      end
+      
+      generate_missing(args)
+    end
+    
+    def generate_missing(args)
+      if presence_validated_attributes and !presence_validated_attributes.empty?
+        req = {}
+        (presence_validated_attributes.keys - args.keys).each {|a| req[a.to_s] = true } # find attributes required by validates_presence_of not already set
+        
+        belongs_to_associations = reflect_on_all_associations(:belongs_to).to_a
+        missing = belongs_to_associations.select { |a|  req[a.name.to_s] or req[a.primary_key_name.to_s] }
+        if create_scope = scope(:create)
+          missing.reject! { |a|   create_scope.include?(a.primary_key_name) }
+        end
+        missing.each {|a| args[a.name] = a.class_name.constantize.generate }
       end
     end
   end
