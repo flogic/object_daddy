@@ -31,7 +31,17 @@ module ObjectDaddy
             generator[:prev] = args[handle] = generator[:block].call(generator[:prev])
           end
         elsif generator[:method]
-          args[handle] = send(generator[:method])
+          method = method(generator[:method])
+          if method.arity == 1
+            if generator[:start]
+              generator[:prev] = args[handle] = generator[:start]
+              generator.delete(:start)
+            else
+              generator[:prev] = args[handle] = method.call(generator[:prev])
+            end
+          else
+            args[handle] = method.call
+          end
         elsif generator[:class]
           args[handle] = generator[:class].next
         end
@@ -76,7 +86,9 @@ module ObjectDaddy
       end
       
       if args[:method]
-        record_generator_for(handle, :method => args[:method].to_sym)
+        h = { :method => args[:method].to_sym }
+        h[:start] = args[:start] if args[:start]
+        record_generator_for(handle, h)
       elsif args[:class]
         raise ArgumentError, "generator class [#{args[:class].name}] does not have a :next method" unless args[:class].respond_to?(:next)
         record_generator_for(handle, :class => args[:class])

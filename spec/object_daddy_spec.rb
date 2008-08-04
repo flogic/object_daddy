@@ -92,6 +92,11 @@ describe ObjectDaddy, "when registering a generator method" do
     lambda { @class.generator_for :foo, :method => :fake_method }.should_not raise_error(ArgumentError)
   end
   
+  it "should allow an initial value with a method argument" do
+    @class.stubs(:method_name)
+    lambda { @class.generator_for :foo, :start => 'baz', :method => :method_name }.should_not raise_error
+  end
+  
   it 'should succeed if a value is provided' do
     lambda { @class.generator_for :foo, 'value' }.should_not raise_error(ArgumentError)
   end
@@ -314,6 +319,45 @@ describe ObjectDaddy, "when spawning a class instance" do
   
   it "should return the block applied to the previous value when repeatedly calling a block generator" do
     @class.generator_for :foo do |prev| prev ? prev.succ : 'test'; end
+    @class.spawn
+    @class.spawn.foo.should == 'tesu'
+  end
+  
+  it "should return the initial value first if one was registered for a method generator" do
+    @class.instance_eval do
+      def self.generator_value_method(prev)
+        'foo'
+      end
+    end
+    
+    @class.generator_for :foo, :start => 'frobnitz', :method => :generator_value_method
+    @class.spawn.foo.should == 'frobnitz'
+  end
+  
+  it "should return the method applied to the initial value on the second call if an initial value was registered for a method generator" do
+    @class.instance_eval do
+      def self.generator_value_method(prev)
+        prev.succ
+      end
+    end
+    
+    @class.generator_for :foo, :start => 'frobnitz', :method => :generator_value_method
+    @class.spawn
+    @class.spawn.foo.should == 'frobniua'
+  end
+  
+  it "should return the method applied to the previous value when repeatedly calling a method generator" do
+    @class.instance_eval do
+      def self.generator_value_method(prev)
+        if prev
+          prev.succ
+        else
+          'test'
+        end
+      end
+    end
+    
+    @class.generator_for :foo, :method => :generator_value_method
     @class.spawn
     @class.spawn.foo.should == 'tesu'
   end
