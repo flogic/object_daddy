@@ -105,23 +105,14 @@ module ObjectDaddy
     def generate_values(args)
       (generators || {}).each_pair do |handle, gen_data|
         next if args.include?(handle)
+        
         generator = gen_data[:generator]
         if generator[:block]
-          if generator[:start]
-            generator[:prev] = args[handle] = generator[:start]
-            generator.delete(:start)
-          else
-            generator[:prev] = args[handle] = generator[:block].call(generator[:prev])
-          end
+          process_generated_value(args, handle, generator, generator[:block])
         elsif generator[:method]
           method = method(generator[:method])
           if method.arity == 1
-            if generator[:start]
-              generator[:prev] = args[handle] = generator[:start]
-              generator.delete(:start)
-            else
-              generator[:prev] = args[handle] = method.call(generator[:prev])
-            end
+            process_generated_value(args, handle, generator, method)
           else
             args[handle] = method.call
           end
@@ -131,6 +122,15 @@ module ObjectDaddy
       end
       
       generate_missing(args)
+    end
+    
+    def process_generated_value(args, handle, generator, block)
+      if generator[:start]
+        generator[:prev] = args[handle] = generator[:start]
+        generator.delete(:start)
+      else
+        generator[:prev] = args[handle] = block.call(generator[:prev])
+      end
     end
     
     def generate_missing(args)
