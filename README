@@ -160,17 +160,18 @@ calls (and support methods) can be written without polluting the model files
 with Object Daddy information.
 
 Object Daddy, when installed as a Rails plugin, will create
-RAILS_ROOT/test/exemplars/ as a place to hold "exemplar" files for Rails model
+RAILS_ROOT/spec/exemplars/ as a place to hold "exemplar" files for Rails model
 classes.  (We are seeking perhaps some better terminology)
 
 An exemplar for the User model would then be found in
-RAILS_ROOT/test/exemplars/user_exemplar.rb (when using RSpec Object Daddy will
-look for your exemplars in RAILS_ROOT/spec/exemplars instead). Exemplar files are
-completely optional, and no model need have exemplar files. The .generate method
-will still exist and be callable, and generator_for can be declared in the model
-files themselves. If an exemplar file is available when .generate is called on
-a model, the exemplar file will be loaded and used. An example
-user_exemplar.rb appears below:
+RAILS_ROOT/spec/exemplars/user_exemplar.rb (when you are using a testing tool
+which works from RAILS_ROOT/test, Object Daddy will create
+RAILS_ROOT/test/exemplars and look for your exemplars in that directory
+instead). Exemplar files are completely optional, and no model need have
+exemplar files. The .generate method will still exist and be callable, and
+generator_for can be declared in the model files themselves. If an exemplar
+file is available when .generate is called on a model, the exemplar file will
+be loaded and used. An example user_exemplar.rb appears below:
 
 require 'ssn_generator'
 
