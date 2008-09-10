@@ -11,19 +11,81 @@ describe 'the plugin install.rb script' do
     eval File.read(File.join(File.dirname(__FILE__), *%w[.. install.rb ]))
   end
   
-  describe 'when there is a test/exemplars directory under RAILS_ROOT' do
-    it 'CURRENTLY does not make a new test/exemplars directory' do
-      File.stubs(:directory?).with('./../../../test/exemplars').returns(true)      
-      FileUtils.expects(:mkdir).never
-      do_install
+  describe 'when there is a spec directory under RAILS_ROOT' do
+    before :each do
+      File.stubs(:directory?).with('./../../../spec').returns(true)      
+    end
+    
+    describe 'and there is a spec/exemplars directory under RAILS_ROOT' do
+      before :each do
+        File.stubs(:directory?).with('./../../../spec/exemplars').returns(true)      
+      end
+      
+      it 'should not create any new directories' do
+        FileUtils.expects(:mkdir).never
+        do_install
+      end
+    end
+    
+    describe 'but there is no spec/exemplars directory under RAILS_ROOT' do
+      before :each do
+        File.stubs(:directory?).with('./../../../spec/exemplars').returns(false)      
+      end
+            
+      it 'should create a spec/exemplars directory under RAILS_ROOT' do        
+        FileUtils.expects(:mkdir).with('./../../../spec/exemplars')
+        do_install
+      end
     end
   end
+  
+  describe 'when there is no spec directory under RAILS_ROOT' do
+    before :each do
+      File.stubs(:directory?).with('./../../../spec').returns(false)      
+    end
+    
+    describe 'and there is a test directory under RAILS_ROOT' do
+      before :each do
+        File.stubs(:directory?).with('./../../../test').returns(true)      
+      end
 
-  describe 'when there is no test/exemplars directory under RAILS_ROOT' do
-    it 'CURRENTLY creates a new test/exemplars directory' do
-      File.stubs(:directory?).with('./../../../test/exemplars').returns(false)
-      FileUtils.expects(:mkdir)
-      do_install
+      describe 'and there is a test/exemplars directory under RAILS_ROOT' do
+        before :each do
+          File.stubs(:directory?).with('./../../../test/exemplars').returns(true)      
+        end
+
+        it 'should not create any new directories' do
+          FileUtils.expects(:mkdir).never
+          do_install
+        end
+      end
+      
+      describe 'but there is no test/exemplars directory under RAILS_ROOT' do
+        before :each do
+          File.stubs(:directory?).with('./../../../test/exemplars').returns(false)      
+        end
+
+        it 'should create a test/exemplars directory under RAILS_ROOT' do
+          FileUtils.expects(:mkdir).with('./../../../test/exemplars')
+          do_install
+        end
+      end
+    end
+    
+    describe 'and there is no test directory under RAILS_ROOT' do
+      before :each do
+        File.stubs(:directory?).with('./../../../test').returns(false)      
+      end
+
+      it 'should create a spec directory under RAILS_ROOT' do
+        FileUtils.expects(:mkdir).with('./../../../spec')
+        do_install
+      end
+      
+      it 'should create a spec/exemplars directory under RAILS_ROOT' do
+        FileUtils.expects(:mkdir).with('./../../../spec/exemplars')
+        do_install
+      end
     end
   end
   
