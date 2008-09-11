@@ -524,6 +524,40 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
       Frobnitz.should respond_to(:generate!)
     end
     
+    describe "and a block is passed to generate" do
+      it "should yield the instance to the block" do
+        yielded_object = nil
+        YaModel.generate do |obj|
+          yielded_object = obj
+        end
+        YaModel.should === yielded_object
+      end
+
+      it "should save the instance before yielding" do
+        instance = Frobnitz.new
+        YaModel.generate do |obj|
+          obj.should_not be_new_record
+        end
+      end
+    end
+    
+    describe "and a block is passed to generate!" do
+      it "should yield the instance to the block" do
+        yielded_object = nil
+        YaModel.generate! do |obj|
+          yielded_object = obj
+        end
+        YaModel.should === yielded_object
+      end
+
+      it "should save the instance before yielding" do
+        instance = Frobnitz.new
+        YaModel.generate! do |obj|
+          obj.should_not be_new_record
+        end
+      end
+    end
+    
     describe 'giving an exemplar path for an ActiveRecord model' do
       it 'should check if a spec directory exists' do
         File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec'))
