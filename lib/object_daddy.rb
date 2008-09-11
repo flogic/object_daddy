@@ -165,17 +165,17 @@ module ObjectDaddy
       validates_presence_of_without_object_daddy(*attr_names)
     end
     
-    def generate(args = {}, &block)
+    def generate(args = {})
       spawn(args) do |instance|
         instance.save
-        block.call(instance) if block
+        yield instance if block_given?
       end
     end
     
-    def generate!(args = {}, &block)
+    def generate!(args = {})
       spawn(args) do |instance|
         instance.save!
-        block.call(instance) if block
+        yield instance if block_given?
       end
     end
   end
