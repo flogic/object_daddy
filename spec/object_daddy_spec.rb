@@ -254,6 +254,14 @@ describe ObjectDaddy, "when spawning a class instance" do
     @class.stubs(:name).returns('Widget')
   end
   
+  it "should yield the instance to a block if given" do
+    yielded_object = nil
+    @class.spawn do |obj|
+      yielded_object = obj
+    end
+    @class.should === yielded_object
+  end
+  
   it "should register exemplars for the target class" do
     @class.expects(:gather_exemplars)
     @class.spawn

@@ -21,7 +21,9 @@ module ObjectDaddy
     def spawn(args = {})
       gather_exemplars
       generate_values(args)
-      new(args)
+      instance = new(args)
+      yield instance if block_given?
+      instance
     end
 
     # register a generator for an attribute of this class
