@@ -17,7 +17,14 @@ module ObjectDaddy
     attr_reader :presence_validated_attributes
     protected :exemplars_generated=
     
-    # create a valid instance of this class, using any known generators
+    # :call-seq:
+    #   spawn()
+    #   spawn() do |obj| ... end
+    #   spawn(args)
+    #   spawn(args) do |obj| ... end
+    #
+    # Creates a valid instance of this class, using any known generators. The
+    # generated instance is yielded to a block if provided.
     def spawn(args = {})
       gather_exemplars
       generate_values(args)
@@ -165,6 +172,17 @@ module ObjectDaddy
       validates_presence_of_without_object_daddy(*attr_names)
     end
     
+    # :call-seq:
+    #   generate()
+    #   generate() do |obj| ... end
+    #   generate(args)
+    #   generate(args) do |obj| ... end
+    #
+    # Creates and tries to save an instance of this class, using any known
+    # generators. The generated instance is yielded to a block if provided.
+    #
+    # This will not raise errors on a failed save. Use generate! if you
+    # want errors raised.
     def generate(args = {})
       spawn(args) do |instance|
         instance.save
@@ -172,6 +190,17 @@ module ObjectDaddy
       end
     end
     
+    # :call-seq:
+    #   generate()
+    #   generate() do |obj| ... end
+    #   generate(args)
+    #   generate(args) do |obj| ... end
+    #
+    # Creates and tries to save! an instance of this class, using any known
+    # generators. The generated instance is yielded to a block if provided.
+    #
+    # This will raise errors on a failed save. Use generate if you do not want
+    # errors raised.
     def generate!(args = {})
       spawn(args) do |instance|
         instance.save!

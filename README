@@ -7,9 +7,9 @@ License::	MIT License.  See MIT-LICENSE file for more details.
 
 Object Daddy is a library (as well as a Ruby on Rails plugin) designed to
 assist in automating testing of large collections of objects, especially webs
-of ActiveRecord models. It is a descendant of the "Object Mother" pattern for
-creating objects for testing, and is related to the concept of an object
-exemplar or "stereotype".
+of ActiveRecord models. It is a descendent of the "Object Mother" pattern for
+creating objects for testing, and is related to the concept of an "object
+exemplar" or "stereotype".
 
 WARNING: This code is very much at an "alpha" development stage. Usage, APIs,
 etc., are all subject to change.
@@ -190,6 +190,65 @@ class User < ActiveRecord::Base
     @last_username.succ
   end
 end
+
+== Blocks
+
+The spawn, generate and generate! methods can all accept a block, to which
+they'll yield the generated object. This provides a nice scoping mechanism in
+your code examples. Consider:
+
+  describe "admin user" do
+    it "should be authorized to create company profiles"
+      admin_user = User.generate!
+			admin_user.activate!
+      admin_user.add_role("admin")
+
+      admin_user.should be_authorized(:create, Company)
+    end
+  end
+
+This could be refactored to:
+
+	describe "admin user" do
+	
+	  it "should be authorized to create company profiles"
+	    admin_user = User.generate! do |user|
+				user.activate!
+	      user.add_role("admin")
+	    end
+
+	    admin_user.should be_authorized(:create, Company)
+	  end
+	end
+	
+Or:
+
+	describe "admin user" do
+	  it "should be authorized to create company profiles"
+	    User.generate! do |user|
+				user.activate!
+	      user.add_role("admin")
+	    end.should be_authorized(:create, Company)
+	  end
+	end
+
+Or even:
+
+	describe "admin user" do
+		def admin_user
+    	@admin_user ||= User.generate! do |user|
+				user.activate!
+      	user.add_role("admin")
+			end
+		end
+
+	  it "should be authorized to create company profiles"
+	    admin_user.should be_authorized(:create, Company)
+	  end
+	end
+
+This last refactoring allows you to reuse the admin_user method across
+multiple code examples, balancing DRY with local data.
 
 == Object Daddy and Fixtures
 
