@@ -1,9 +1,9 @@
 = Object Daddy
 <b>Version 0.2.6 (September 10, 2008)</b>
 
-Author::	Rick Bradley (mailto:blogicx@rickbradley.com), Yossef Mendelssohn (ymendel@pobox.com)
-Copyright::	Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
-License::	MIT License.  See MIT-LICENSE file for more details.
+Author::  Rick Bradley (mailto:blogicx@rickbradley.com), Yossef Mendelssohn (ymendel@pobox.com)
+Copyright::  Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
+License::  MIT License.  See MIT-LICENSE file for more details.
 
 Object Daddy is a library (as well as a Ruby on Rails plugin) designed to
 assist in automating testing of large collections of objects, especially webs
@@ -83,7 +83,7 @@ class User < ActiveRecord::Base
   validates_presence_of :email
   validates_uniqueness_of :email
   validates_format_of :email, 
-	:with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
+  :with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
   validates_presence_of :username
   validates_format_of :username, :with => /^[a-z0-9_]{4,12}$/i
 
@@ -105,7 +105,7 @@ end
 class SSNGenerator
   def self.next
     @last ||= '000-00-0000'
-	@last = ("%09d" % (@last.gsub('-', '').to_i + 1)).sub(/^(\d{3})(\d{2})(\d{4})$/, '\1-\2-\3')
+    @last = ("%09d" % (@last.gsub('-', '').to_i + 1)).sub(/^(\d{3})(\d{2})(\d{4})$/, '\1-\2-\3')
   end
 end
 
@@ -200,7 +200,7 @@ your code examples. Consider:
   describe "admin user" do
     it "should be authorized to create company profiles"
       admin_user = User.generate!
-			admin_user.activate!
+      admin_user.activate!
       admin_user.add_role("admin")
 
       admin_user.should be_authorized(:create, Company)
@@ -209,43 +209,42 @@ your code examples. Consider:
 
 This could be refactored to:
 
-	describe "admin user" do
-	
-	  it "should be authorized to create company profiles"
-	    admin_user = User.generate! do |user|
-				user.activate!
-	      user.add_role("admin")
-	    end
+  describe "admin user" do
+    it "should be authorized to create company profiles" do
+      admin_user = User.generate! do |user|
+        user.activate!
+        user.add_role("admin")
+      end
 
-	    admin_user.should be_authorized(:create, Company)
-	  end
-	end
-	
+      admin_user.should be_authorized(:create, Company)
+    end
+  end
+  
 Or:
 
-	describe "admin user" do
-	  it "should be authorized to create company profiles"
-	    User.generate! do |user|
-				user.activate!
-	      user.add_role("admin")
-	    end.should be_authorized(:create, Company)
-	  end
-	end
+  describe "admin user" do
+    it "should be authorized to create company profiles"
+      User.generate! do |user|
+        user.activate!
+        user.add_role("admin")
+      end.should be_authorized(:create, Company)
+    end
+  end
 
 Or even:
 
-	describe "admin user" do
-		def admin_user
-    	@admin_user ||= User.generate! do |user|
-				user.activate!
-      	user.add_role("admin")
-			end
-		end
+  describe "admin user" do
+    def admin_user
+      @admin_user ||= User.generate! do |user|
+        user.activate!
+        user.add_role("admin")
+      end
+    end
 
-	  it "should be authorized to create company profiles"
-	    admin_user.should be_authorized(:create, Company)
-	  end
-	end
+    it "should be authorized to create company profiles"
+      admin_user.should be_authorized(:create, Company)
+    end
+  end
 
 This last refactoring allows you to reuse the admin_user method across
 multiple code examples, balancing DRY with local data.
