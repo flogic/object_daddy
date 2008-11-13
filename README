@@ -1,5 +1,5 @@
 = Object Daddy
-<b>Version 0.2.7 (September 12, 2008)</b>
+<b>Version 0.2.8 (November 13, 2008)</b>
 
 Author::  Rick Bradley (mailto:blogicx@rickbradley.com), Yossef Mendelssohn (ymendel@pobox.com)
 Copyright::  Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
@@ -113,6 +113,16 @@ Note that the block method of invocation (as used with :email above) takes an
 optional :start argument, to specify the value of that attribute on the first
 run. The block will be called thereafter with the previous value of the
 attribute and will generate the next attribute value to be used.
+
+A simple default block is provided for any generator with a :start value.
+
+class User < ActiveRecord::Base
+  generator_for :name, :start => 'Joe' do |prev|
+    prev.succ
+  end
+  
+  generator_for :name, :start => 'Joe'  # equivalent to the above
+end
 
 The :method form takes a symbol naming a class method in the model class to be
 called to generate a new value for the attribute in question. If the method 
