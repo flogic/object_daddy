@@ -58,6 +58,10 @@ module ObjectDaddy
         args = {}  # args is assumed to be a hash for the rest of the method
       end
       
+      if args[:start]
+        block = lambda { |prev|  prev.succ }
+      end
+      
       if args[:method]
         h = { :method => args[:method].to_sym }
         h[:start] = args[:start] if args[:start]

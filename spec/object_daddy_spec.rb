@@ -331,6 +331,16 @@ describe ObjectDaddy, "when spawning a class instance" do
     @class.spawn.foo.should == 'tesu'
   end
   
+  it 'should not require a block if an initial value is given' do
+    lambda { @class.generator_for :foo, :start => 'crapola' }.should_not raise_error(ArgumentError)
+  end
+  
+  it 'should default the generator to increment the value if an initial value is given' do
+    @class.generator_for :foo, :start => 'crapola'
+    @class.spawn
+    @class.spawn.foo.should == 'crapolb'
+  end
+  
   it "should return the initial value first if one was registered for a method generator" do
     @class.instance_eval do
       def self.generator_value_method(prev)
