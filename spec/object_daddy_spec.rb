@@ -709,7 +709,7 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     end
     
     it "should ignore optional arguments to presence_of validators" do
-      Frobnitz.presence_validated_attributes.should include(:title)
+      Frobnitz.presence_validated_attributes.should have_key(:title)
     end
     
     it "should return an unsaved record if spawning" do
