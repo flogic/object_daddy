@@ -320,9 +320,9 @@ describe ObjectDaddy, "when spawning a class instance" do
   end
   
   it "should return the block applied to the initial value on the second call if an initial value was registered for a block generator" do
-    @class.generator_for :foo, :start => 'frobnitz' do |prev| prev.succ; end
+    @class.generator_for :foo, :start => 'frobnitz' do |prev| prev + 'a'; end
     @class.spawn
-    @class.spawn.foo.should == 'frobniua'
+    @class.spawn.foo.should == 'frobnitza'
   end
   
   it "should return the block applied to the previous value when repeatedly calling a block generator" do

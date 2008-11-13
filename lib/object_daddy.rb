@@ -59,7 +59,7 @@ module ObjectDaddy
       end
       
       if args[:start]
-        block = lambda { |prev|  prev.succ }
+        block ||= lambda { |prev|  prev.succ }
       end
       
       if args[:method]
