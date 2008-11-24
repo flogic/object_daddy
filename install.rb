@@ -1,7 +1,7 @@
 require 'fileutils'
 
 def readme_contents
-  IO.read(File.join(File.dirname(__FILE__), 'README'))
+  IO.read(File.join(File.dirname(__FILE__), 'README.markdown'))
 end
 
 rails_root = File.dirname(__FILE__) + '/../../../'
