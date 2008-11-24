@@ -21,12 +21,15 @@ See [http://b.logi.cx/2007/11/26/object-daddy](http://b.logi.cx/2007/11/26/objec
 
 ## Installation
 
-1. Unpack the object_daddy directory into vendor/rails/ in your rails project.
-2. Run the object_daddy/install.rb Ruby script.
-
-Or, as an alternative and assuming your script/plugin has git support...
+Presuming your version of Rails has git plugin installation support:
 
   script/plugin install git://github.com/flogic/object_daddy.git
+
+Otherwise, you can install object_daddy by hand:
+
+1. Unpack the object_daddy directory into vendor/plugins/ in your rails project.
+2. Run the object_daddy/install.rb Ruby script.
+
 
 ## Testing
 
