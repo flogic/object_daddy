@@ -157,6 +157,7 @@ module ObjectDaddy
         if create_scope = scope(:create)
           missing.reject! { |a|   create_scope.include?(a.primary_key_name) }
         end
+        missing.reject! { |a|  [a.name, a.primary_key_name].any? { |n|  args.stringify_keys.include?(n.to_s) } }
         missing.each {|a| args[a.name] = a.class_name.constantize.generate }
       end
     end
