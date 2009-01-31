@@ -11,4 +11,5 @@ spec/resources/config/database.yml
 spec/resources/schema
 spec/spec.opts
 spec/spec_helper.rb
+rails/init.rb
 Manifest.txt

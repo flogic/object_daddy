@@ -1,6 +1,6 @@
 Object Daddy
 ============
-_Version 0.3.1 (January 30, 2009)_
+_Version 0.4.0 (January 31, 2009)_
 
 __Authors:__  [Rick Bradley](mailto:blogicx@rickbradley.com), [Yossef Mendelssohn](mailto:ymendel@pobox.com)
 
@@ -20,6 +20,18 @@ etc., are all subject to change.
 See [http://b.logi.cx/2007/11/26/object-daddy](http://b.logi.cx/2007/11/26/object-daddy) for inspiration, historical drama, and too much reading.
 
 ## Installation
+
+
+## As Gem
+
+  sudo gem install object_daddy
+
+config/enviroments/test.rb
+
+  gem.config "object_daddy"
+
+
+## As Plugin
 
 Presuming your version of Rails has git plugin installation support:
 
@@ -90,7 +102,7 @@ call, or using a generator class.
     class User < ActiveRecord::Base
       validates_presence_of :email
       validates_uniqueness_of :email
-      validates_format_of :email, 
+      validates_format_of :email,
       :with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
       validates_presence_of :username
       validates_format_of :username, :with => /^[a-z0-9_]{4,12}$/i
@@ -128,12 +140,12 @@ A simple default block is provided for any generator with a :start value.
       generator_for :name, :start => 'Joe' do |prev|
         prev.succ
       end
-  
+
       generator_for :name, :start => 'Joe'  # equivalent to the above
     end
 
 The _:method_ form takes a symbol naming a class method in the model class to be
-called to generate a new value for the attribute in question. If the method 
+called to generate a new value for the attribute in question. If the method
 takes a single argument, it will act much like the block method of invocation,
 being called with the previous value and generating the next.
 
@@ -237,7 +249,7 @@ This could be refactored to:
         admin_user.should be_authorized(:create, Company)
       end
     end
-  
+
 Or:
 
     describe "admin user" do
@@ -275,7 +287,7 @@ own, I suppose.
 
 ## Known Issues
 
-The simple invocation forms for `generator_for` when using literal values do not 
+The simple invocation forms for `generator_for` when using literal values do not
 work if the literal value is a Hash. Don't do that.
 
     class User < ActiveRecord::Base

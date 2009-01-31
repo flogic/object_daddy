@@ -2,7 +2,7 @@ $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 require 'rubygems'
 require 'echoe'
 
-VERSION = '0.2.9.1'
+VERSION = '0.4.0'
 
 Echoe.new('object_daddy', VERSION) do |p|
   p.author = 'Rick Bradley', 'Yossef Mendelssohn'
