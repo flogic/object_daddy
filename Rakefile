@@ -1,17 +1,21 @@
-$:.unshift(File.join(File.dirname(__FILE__), 'lib'))
-require 'rubygems'
-require 'echoe'
-
-VERSION = '0.4.0'
-
-Echoe.new('object_daddy', VERSION) do |p|
-  p.author = 'Rick Bradley', 'Yossef Mendelssohn'
-  p.email = 'blogicx@rickbradley.com', 'ymendel@pobox.com'
-  p.summary = VERSION
-  p.url = 'http://github.com/flogic/object_daddy'
-  p.manifest_name = 'Manifest.txt'
+require 'rake'
+require 'rake/testtask'
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |s|
+    s.name = "object_daddy"
+    s.summary = "Object Daddy"
+    s.author = 'Rick Bradley', 'Yossef Mendelssohn'
+    s.email = 'blogicx@rickbradley.com', 'ymendel@pobox.com'
+    s.homepage = 'http://github.com/flogic/object_daddy'
+  end
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickels-jeweler -s http://gems.github.com"
 end
 
-['audit','test','test_deps','default','post_blog'].each do |task|
-  Rake.application.instance_variable_get('@tasks').delete(task)
+Rake::TestTask.new do |t|
+  t.libs << 'lib'
+  t.pattern = 'spec/*_spec.rb'
+  t.verbose = false
 end
+
