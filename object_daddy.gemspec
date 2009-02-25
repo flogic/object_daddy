@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.authors = ["Rick Bradley", "Yossef Mendelssohn"]
   s.date = %q{2009-02-25}
   s.email = ["blogicx@rickbradley.com", "ymendel@pobox.com"]
-  s.files = ["Manifest.txt", "README.markdown", "VERSION.yml", "lib/object_daddy.rb", "spec/install_spec.rb", "spec/object_daddy_spec.rb", "spec/resources", "spec/resources/config", "spec/resources/config/database.yml", "spec/resources/schema", "spec/spec.opts", "spec/spec_helper.rb", "spec/tmp"]
+  s.files = ["Manifest.txt", "README.markdown", "VERSION.yml", "init.rb", "install.rb", "lib/object_daddy.rb", "rails/init.rb", "spec/install_spec.rb", "spec/object_daddy_spec.rb", "spec/resources", "spec/resources/config", "spec/resources/config/database.yml", "spec/resources/schema", "spec/spec.opts", "spec/spec_helper.rb", "spec/tmp"]
   s.has_rdoc = true
   s.homepage = %q{http://github.com/flogic/object_daddy}
   s.rdoc_options = ["--inline-source", "--charset=UTF-8"]
