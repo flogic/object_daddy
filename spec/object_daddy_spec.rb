@@ -438,6 +438,25 @@ describe ObjectDaddy, "when spawning a class instance" do
     @class.generator_for :foo => 5
     @class.spawn(:foo => false).foo.should be(false)
   end
+
+  describe 'for an abstract parent class' do
+    before :each do
+      Widget = Class.new(OpenStruct) { include ObjectDaddy }
+      SubWidget = Class.new(Widget) {include ObjectDaddy }
+      Widget.stubs(:exemplar_path).returns(@file_path)
+      SubWidget.stubs(:exemplar_path).returns(File.join(@file_path, 'sub_widget_exemplar.rb'))
+    end
+
+    it 'should generate an instance of a specified concrete subclass (specced using a symbol)' do
+      Widget.generates_subclass :SubWidget
+      Widget.spawn.should be_instance_of SubWidget
+    end
+
+    it 'should generate an instance of a specified concrete subclass (specced using a string)' do
+      Widget.generates_subclass 'SubWidget'
+      Widget.spawn.should be_instance_of SubWidget
+    end
+  end
   
   describe 'for a subclass' do
     before :each do
@@ -478,7 +497,7 @@ describe ObjectDaddy, "when spawning a class instance" do
         SubWidget.spawn.blah.should == 'blip'
       end
     end
-    
+
     describe 'using generators called directly' do
       it 'should use generators from the parent class' do
         @class.generator_for :blah do |prev| 'blah'; end
