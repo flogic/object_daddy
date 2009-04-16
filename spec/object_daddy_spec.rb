@@ -447,6 +447,10 @@ describe ObjectDaddy, "when spawning a class instance" do
       SubWidget.stubs(:exemplar_path).returns(File.join(@file_path, 'sub_widget_exemplar.rb'))
     end
 
+    after :each do
+      [:Widget, :SubWidget].each { |const|  Object.send(:remove_const, const) }
+    end
+    
     it 'should generate an instance of a specified concrete subclass (specced using a symbol)' do
       Widget.generates_subclass :SubWidget
       Widget.spawn.should be_instance_of SubWidget
@@ -455,6 +459,22 @@ describe ObjectDaddy, "when spawning a class instance" do
     it 'should generate an instance of a specified concrete subclass (specced using a string)' do
       Widget.generates_subclass 'SubWidget'
       Widget.spawn.should be_instance_of SubWidget
+    end
+
+    describe 'using exemplar files' do
+      before :each do
+        File.open(@file_name, 'w') do |f|
+          f.puts "class Widget\ngenerates_subclass 'SubWidget'\nend"
+        end
+      end
+
+      after :each do
+        File.unlink @file_name
+      end
+
+      it 'should generate an instance fo the specified concrete subclass' do
+        Widget.spawn.should be_instance_of SubWidget
+      end
     end
   end
   

@@ -26,12 +26,12 @@ module ObjectDaddy
     # Creates a valid instance of this class, using any known generators. The
     # generated instance is yielded to a block if provided.
     def spawn(args = {})
+      gather_exemplars
       if @concrete_subclass_name
         return block_given? \
           ? const_get(@concrete_subclass_name).spawn(args) {|instance| yield instance} \
           : const_get(@concrete_subclass_name).spawn(args)
       end
-      gather_exemplars
       generate_values(args)
       instance = new(args)
       yield instance if block_given?
