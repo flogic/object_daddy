@@ -193,7 +193,27 @@ describe ObjectDaddy, 'when registering exemplars' do
         Object.send(:remove_const, :Widget)
       end
     end
-    
+
+    it "should read from all paths when exemplar_path returns an array" do
+      # we are using the concrete Widget class here because otherwise it's difficult to have our exemplar file work in our class
+      begin
+        # a dummy class, useful for testing the actual loading of exemplar files
+        Widget = Class.new(OpenStruct) { include ObjectDaddy }
+        File.open(@file_name, 'w') {|f| f.puts "class Widget\ngenerator_for :foo\nend\n"}
+        other_filename = 'widget_exemplar.rb'
+        File.open(other_filename, 'w') {|f| f.puts "class Widget\ngenerator_for :foo\nend\n"}
+        Widget.stubs(:exemplar_path).returns(['.', @file_path])
+        Widget.expects(:generator_for).times(2)
+        Widget.gather_exemplars
+      ensure
+        # clean up test data file
+        File.unlink(@file_name) if File.exists?(@file_name)
+        File.unlink(other_filename) if File.exists?(other_filename)
+        Object.send(:remove_const, :Widget)
+      end
+    end
+
+
     it 'should record that exemplars have been registered' do
       @class.expects(:exemplars_generated=).with(true)
       @class.gather_exemplars
@@ -418,6 +438,54 @@ describe ObjectDaddy, "when spawning a class instance" do
     @class.generator_for :foo => 5
     @class.spawn(:foo => false).foo.should be(false)
   end
+
+  describe 'for an abstract parent class' do
+    before :each do
+      Widget = Class.new(OpenStruct) { include ObjectDaddy }
+      SubWidget = Class.new(Widget) {include ObjectDaddy }
+      Widget.stubs(:exemplar_path).returns(@file_path)
+      SubWidget.stubs(:exemplar_path).returns(File.join(@file_path, 'sub_widget_exemplar.rb'))
+    end
+
+    after :each do
+      [:Widget, :SubWidget].each { |const|  Object.send(:remove_const, const) }
+    end
+    
+    it 'should generate an instance of a specified concrete subclass (specced using a symbol)' do
+      Widget.generates_subclass :SubWidget
+      Widget.spawn.should be_instance_of(SubWidget)
+    end
+
+    it 'should generate an instance of a specified concrete subclass (specced using a string)' do
+      Widget.generates_subclass 'SubWidget'
+      Widget.spawn.should be_instance_of(SubWidget)
+    end
+    
+    it 'should generate an instance of a specified concrete subclass and yield to a block if given' do
+      yielded_object = nil
+      Widget.generates_subclass :SubWidget
+      Widget.spawn do |obj|
+        yielded_object = obj
+      end
+      yielded_object.should be_instance_of(SubWidget)
+    end
+
+    describe 'using exemplar files' do
+      before :each do
+        File.open(@file_name, 'w') do |f|
+          f.puts "class Widget\ngenerates_subclass 'SubWidget'\nend"
+        end
+      end
+
+      after :each do
+        File.unlink @file_name
+      end
+
+      it 'should generate an instance fo the specified concrete subclass' do
+        Widget.spawn.should be_instance_of SubWidget
+      end
+    end
+  end
   
   describe 'for a subclass' do
     before :each do
@@ -458,7 +526,7 @@ describe ObjectDaddy, "when spawning a class instance" do
         SubWidget.spawn.blah.should == 'blip'
       end
     end
-    
+
     describe 'using generators called directly' do
       it 'should use generators from the parent class' do
         @class.generator_for :blah do |prev| 'blah'; end

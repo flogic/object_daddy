@@ -1,3 +1,5 @@
+require 'rubygems'
+require 'activerecord'
 $:.unshift(File.dirname(__FILE__) + '/../lib/')
 
 Spec::Runner.configure do |config|
@@ -14,7 +16,7 @@ def setup_rails_database
   ActiveRecord::Base.configurations = {'test' => db[ENV['DB'] || 'sqlite3']}
   ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations['test'])
   ActiveRecord::Migration.verbose = false
-  load "#{dir}/resources/schema"  
+  load "#{dir}/resources/schema"
 
   require "#{dir}/../init.rb"
 end

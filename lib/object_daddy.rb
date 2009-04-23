@@ -27,6 +27,11 @@ module ObjectDaddy
     # generated instance is yielded to a block if provided.
     def spawn(args = {})
       gather_exemplars
+      if @concrete_subclass_name
+        return block_given? \
+          ? const_get(@concrete_subclass_name).spawn(args) {|instance| yield instance} \
+          : const_get(@concrete_subclass_name).spawn(args)
+      end
       generate_values(args)
       instance = new(args)
       yield instance if block_given?
@@ -78,6 +83,10 @@ module ObjectDaddy
         raise ArgumentError, "a block, :class generator, :method generator, or value must be specified to generator_for"
       end
     end
+
+    def generates_subclass(subclass_name)
+      @concrete_subclass_name = subclass_name.to_s
+    end
     
     def gather_exemplars
       return if exemplars_generated
@@ -85,9 +94,11 @@ module ObjectDaddy
         superclass.gather_exemplars
         self.generators = (superclass.generators || {}).dup
       end
-      
-      path = File.join(exemplar_path, "#{underscore(name)}_exemplar.rb")
-      load(path) if File.exists?(path)
+
+      exemplar_path.each do |raw_path|
+        path = File.join(raw_path, "#{underscore(name)}_exemplar.rb")
+        load(path) if File.exists?(path)
+      end
       self.exemplars_generated = true
     end
     
