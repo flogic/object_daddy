@@ -200,12 +200,15 @@ describe ObjectDaddy, 'when registering exemplars' do
         # a dummy class, useful for testing the actual loading of exemplar files
         Widget = Class.new(OpenStruct) { include ObjectDaddy }
         File.open(@file_name, 'w') {|f| f.puts "class Widget\ngenerator_for :foo\nend\n"}
+        other_filename = 'widget_exemplar.rb'
+        File.open(other_filename, 'w') {|f| f.puts "class Widget\ngenerator_for :foo\nend\n"}
         Widget.stubs(:exemplar_path).returns(['.', @file_path])
-        Widget.expects(:generator_for)
+        Widget.expects(:generator_for).times(2)
         Widget.gather_exemplars
       ensure
         # clean up test data file
         File.unlink(@file_name) if File.exists?(@file_name)
+        File.unlink(other_filename) if File.exists?(other_filename)
         Object.send(:remove_const, :Widget)
       end
     end
