@@ -453,12 +453,21 @@ describe ObjectDaddy, "when spawning a class instance" do
     
     it 'should generate an instance of a specified concrete subclass (specced using a symbol)' do
       Widget.generates_subclass :SubWidget
-      Widget.spawn.should be_instance_of SubWidget
+      Widget.spawn.should be_instance_of(SubWidget)
     end
 
     it 'should generate an instance of a specified concrete subclass (specced using a string)' do
       Widget.generates_subclass 'SubWidget'
-      Widget.spawn.should be_instance_of SubWidget
+      Widget.spawn.should be_instance_of(SubWidget)
+    end
+    
+    it 'should generate an instance of a specified concrete subclass and yield to a block if given' do
+      yielded_object = nil
+      Widget.generates_subclass :SubWidget
+      Widget.spawn do |obj|
+        yielded_object = obj
+      end
+      yielded_object.should be_instance_of(SubWidget)
     end
 
     describe 'using exemplar files' do
