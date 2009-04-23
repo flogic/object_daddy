@@ -5,6 +5,7 @@ begin
   Jeweler::Tasks.new do |s|
     s.name = "object_daddy"
     s.summary = "Object Daddy"
+    s.description = "Fixture killer"
     s.authors = ['Rick Bradley', 'Yossef Mendelssohn']
     s.email = 'blogicx@rickbradley.com', 'ymendel@pobox.com'
     s.homepage = 'http://github.com/flogic/object_daddy'
