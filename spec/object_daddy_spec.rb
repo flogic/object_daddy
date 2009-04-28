@@ -482,7 +482,7 @@ describe ObjectDaddy, "when spawning a class instance" do
       end
 
       it 'should generate an instance fo the specified concrete subclass' do
-        Widget.spawn.should be_instance_of SubWidget
+        Widget.spawn.should be_instance_of(SubWidget)
       end
     end
   end
