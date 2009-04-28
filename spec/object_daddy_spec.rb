@@ -839,5 +839,10 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     it "should return a valid object if generate and save succeeds" do
       Frobnitz.generate(:title => '5', :name => 'blah').should be_valid
     end
+    
+    it 'should allow attributes to be overriden with string keys' do
+      Frobnitz.generator_for :name => 'thing'
+      Frobnitz.generate('name' => 'boo').name.should == 'boo'
+    end
   end
 end
