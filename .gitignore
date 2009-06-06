@@ -2,3 +2,4 @@ log
 vendor
 spec/tmp/*.db
 pkg
+rdoc
