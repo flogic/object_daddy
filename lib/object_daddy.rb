@@ -128,7 +128,7 @@ module ObjectDaddy
     
     def generate_values(args)
       (generators || {}).each_pair do |handle, gen_data|
-        next if args.include?(handle)
+        next if args.include?(handle) or args.include?(handle.to_s)
         
         generator = gen_data[:generator]
         if generator[:block]
