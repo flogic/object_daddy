@@ -90,15 +90,18 @@ module ObjectDaddy
     
     def gather_exemplars
       return if exemplars_generated
+      
+      self.generators ||= {}
       if superclass.respond_to?(:gather_exemplars)
         superclass.gather_exemplars
-        self.generators = (superclass.generators || {}).dup
+        self.generators = (superclass.generators).merge(generators).dup
       end
 
       exemplar_path.each do |raw_path|
         path = File.join(raw_path, "#{underscore(name)}_exemplar.rb")
         load(path) if File.exists?(path)
       end
+      
       self.exemplars_generated = true
     end
     
