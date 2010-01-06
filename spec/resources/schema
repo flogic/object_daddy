@@ -27,4 +27,9 @@ ActiveRecord::Schema.define(:version => 0) do
   create_table :ya_models, :force => true do |t|
     t.column :name, :string
   end
+
+  create_table :protected_attributes, :force => true do |t|
+    t.column :public_name, :string
+    t.column :private_name, :string
+  end
 end
