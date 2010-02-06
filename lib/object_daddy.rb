@@ -159,7 +159,11 @@ module ObjectDaddy
         value = generator[:start]
         generator.delete(:start)
       else
-        value = block.call(generator[:prev])
+        if block.arity == 0
+          value = block.call
+        else
+          value = block.call(generator[:prev])
+        end
       end
       generator[:prev] = args[handle] = value
     end
