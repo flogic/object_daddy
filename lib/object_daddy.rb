@@ -179,8 +179,12 @@ module ObjectDaddy
   
   module RailsClassMethods
     def exemplar_path
-      dir = File.directory?(File.join(RAILS_ROOT, 'spec')) ? 'spec' : 'test'
-      File.join(RAILS_ROOT, dir, 'exemplars')
+      paths = ['spec', 'test'].inject([]) do |array, dir|
+        if File.directory?(File.join(RAILS_ROOT, dir))
+          array << File.join(RAILS_ROOT, dir, 'exemplars')
+        end
+        array
+      end
     end
     
     def validates_presence_of_with_object_daddy(*attr_names)
