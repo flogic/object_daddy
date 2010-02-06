@@ -606,6 +606,10 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
   class YaModel < ActiveRecord::Base
   end
 
+  class ProtectedAttribute < ActiveRecord::Base
+    attr_accessible :public_name
+  end
+
   describe ObjectDaddy, "when integrated with Rails" do
     it "should provide a means of generating and saving a class instance" do
       Frobnitz.should respond_to(:generate)
@@ -871,6 +875,20 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     it 'should allow attributes to be overriden with string keys' do
       Frobnitz.generator_for :name => 'thing'
       Frobnitz.generate('name' => 'boo').name.should == 'boo'
+    end
+
+    describe "supporting mass-assignment protected attributes" do
+      it "should allow setting a value for a non-protected attribute" do
+        ProtectedAttribute.generate!(:public_name => 'no_worries').public_name.should == 'no_worries'
+      end
+
+      it "should have a protected attribute, which is not set when using regular create!" do
+        ProtectedAttribute.create!(:private_name => 'protected name').private_name.should == nil
+      end
+
+      it "should allow setting a value for a protected attribute" do
+        ProtectedAttribute.generate!(:private_name => 'protected name').private_name.should == 'protected name'
+      end
     end
   end
 end

@@ -33,7 +33,10 @@ module ObjectDaddy
           : const_get(@concrete_subclass_name).spawn(args)
       end
       generate_values(args)
-      instance = new(args)
+      instance = new
+      args.each_pair do |attribute, value|
+        instance.send("#{attribute}=", value)  # support setting of mass-assignment protected attributes
+      end
       yield instance if block_given?
       instance
     end
