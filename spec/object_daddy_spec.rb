@@ -157,7 +157,7 @@ describe ObjectDaddy, 'when registering exemplars' do
   before :each do
     @class = Class.new(OpenStruct)
     @class.send(:include, ObjectDaddy)
-    @file_path = File.join(File.dirname(__FILE__), 'tmp')
+    @file_path = [File.join(File.dirname(__FILE__), 'tmp')]
     @file_name = File.join(@file_path, 'widget_exemplar.rb')
     @class.stubs(:exemplar_path).returns(@file_path)
     @class.stubs(:name).returns('Widget')
@@ -606,6 +606,10 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
   class YaModel < ActiveRecord::Base
   end
 
+  class ProtectedAttribute < ActiveRecord::Base
+    attr_accessible :public_name
+  end
+
   describe ObjectDaddy, "when integrated with Rails" do
     it "should provide a means of generating and saving a class instance" do
       Frobnitz.should respond_to(:generate)
@@ -652,28 +656,43 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     describe 'giving an exemplar path for an ActiveRecord model' do
       it 'should check if a spec directory exists' do
         File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec'))
-        Frobnitz.exemplar_path
+        File.expects(:directory?).with(File.join(RAILS_ROOT, 'test'))
+        Frobnitz.exemplar_path.should == []
       end
       
       describe 'if a spec directory exists' do
         before :each do
-          File.stubs(:directory?).returns(true)
+          File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec')).returns(true)
+          File.expects(:directory?).with(File.join(RAILS_ROOT, 'test')).returns(false)
         end
         
-        it 'should use the spec directory' do
-          Frobnitz.exemplar_path.should == File.join(RAILS_ROOT, 'spec', 'exemplars')
+        it 'should return the spec directory string in an array' do
+          Frobnitz.exemplar_path.should == [File.join(RAILS_ROOT, 'spec', 'exemplars')]
         end
       end
       
       describe 'if a spec directory does not exist' do
         before :each do
-          File.stubs(:directory?).returns(false)
+          File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec')).returns(false)
+          File.expects(:directory?).with(File.join(RAILS_ROOT, 'test')).returns(true)
         end
         
-        it 'should use the test directory' do
-          Frobnitz.exemplar_path.should == File.join(RAILS_ROOT, 'test', 'exemplars')
+        it 'should return the test directory string in an array' do
+          Frobnitz.exemplar_path.should == [File.join(RAILS_ROOT, 'test', 'exemplars')]
         end
       end
+
+      describe 'if both directories exist' do
+        before :each do
+          File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec')).returns(true)
+          File.expects(:directory?).with(File.join(RAILS_ROOT, 'test')).returns(true)
+        end
+        
+        it 'should return both directory strings in an array' do
+          Frobnitz.exemplar_path.should == [ File.join(RAILS_ROOT, 'spec', 'exemplars'), File.join(RAILS_ROOT, 'test', 'exemplars')]
+        end
+      end
+
     end
     
     describe 'when an association is required by name' do
@@ -856,6 +875,20 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     it 'should allow attributes to be overriden with string keys' do
       Frobnitz.generator_for :name => 'thing'
       Frobnitz.generate('name' => 'boo').name.should == 'boo'
+    end
+
+    describe "supporting mass-assignment protected attributes" do
+      it "should allow setting a value for a non-protected attribute" do
+        ProtectedAttribute.generate!(:public_name => 'no_worries').public_name.should == 'no_worries'
+      end
+
+      it "should have a protected attribute, which is not set when using regular create!" do
+        ProtectedAttribute.create!(:private_name => 'protected name').private_name.should == nil
+      end
+
+      it "should allow setting a value for a protected attribute" do
+        ProtectedAttribute.generate!(:private_name => 'protected name').private_name.should == 'protected name'
+      end
     end
   end
 end

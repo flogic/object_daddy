@@ -33,7 +33,10 @@ module ObjectDaddy
           : const_get(@concrete_subclass_name).spawn(args)
       end
       generate_values(args)
-      instance = new(args)
+      instance = new
+      args.each_pair do |attribute, value|
+        instance.send("#{attribute}=", value)  # support setting of mass-assignment protected attributes
+      end
       yield instance if block_given?
       instance
     end
@@ -156,7 +159,11 @@ module ObjectDaddy
         value = generator[:start]
         generator.delete(:start)
       else
-        value = block.call(generator[:prev])
+        if block.arity == 0
+          value = block.call
+        else
+          value = block.call(generator[:prev])
+        end
       end
       generator[:prev] = args[handle] = value
     end
@@ -179,8 +186,12 @@ module ObjectDaddy
   
   module RailsClassMethods
     def exemplar_path
-      dir = File.directory?(File.join(RAILS_ROOT, 'spec')) ? 'spec' : 'test'
-      File.join(RAILS_ROOT, dir, 'exemplars')
+      paths = ['spec', 'test'].inject([]) do |array, dir|
+        if File.directory?(File.join(RAILS_ROOT, dir))
+          array << File.join(RAILS_ROOT, dir, 'exemplars')
+        end
+        array
+      end
     end
     
     def validates_presence_of_with_object_daddy(*attr_names)

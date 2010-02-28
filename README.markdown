@@ -1,6 +1,6 @@
 Object Daddy
 ============
-_Version 0.4.2 (July 28, 2009)_
+_Version 0.4.3 (February 5, 2010)_
 
 __Authors:__  [Rick Bradley](mailto:blogicx@rickbradley.com), [Yossef Mendelssohn](mailto:ymendel@pobox.com)
 
