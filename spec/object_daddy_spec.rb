@@ -506,7 +506,7 @@ describe ObjectDaddy, "when spawning a class instance" do
         SubWidget.stubs(:exemplar_path).returns(@subfile_path)
         
         File.open(@file_name, 'w') do |f|
-          f.puts "class Widget\ngenerator_for :blah do |prev| 'blah'; end\nend\n"
+          f.puts "class Widget\ngenerator_for :blah do |prev| 'blah'; end\ngenerator_for :other do |prev| 'bang'; end\nend\n"
         end
       end
       
@@ -516,35 +516,48 @@ describe ObjectDaddy, "when spawning a class instance" do
       end
       
       it 'should use generators from the parent class' do
-        SubWidget.spawn.blah.should == 'blah'
+        SubWidget.spawn.other.should == 'bang'
+        SubWidget.spawn.blah.should  == 'blah'
       end
       
-      it 'should let subclass generators override parent generators' do
-        File.open(@subfile_name, 'w') do |f|
-          f.puts "class SubWidget\ngenerator_for :blah do |prev| 'blip'; end\nend\n"
+      describe 'with subclass generators' do
+        before :each do
+          File.open(@subfile_name, 'w') do |f|
+            f.puts "class SubWidget\ngenerator_for :blah do |prev| 'blip'; end\nend\n"
+          end
         end
-        SubWidget.spawn.blah.should == 'blip'
+        
+        it 'should still use generators from the parent class' do
+          SubWidget.spawn.other.should == 'bang'
+        end
+        
+        it 'should allow overriding parent generators' do
+          SubWidget.spawn.blah.should == 'blip'
+        end
       end
     end
-
+    
     describe 'using generators called directly' do
-      it 'should use generators from the parent class' do
-        @class.generator_for :blah do |prev| 'blah'; end
-        @subclass.spawn.blah.should == 'blah'
+      before :each do
+        @class.generator_for :other do |prev| 'bang'; end
+        @class.generator_for :blah  do |prev| 'blah'; end
       end
       
-      it 'should let subclass generators override parent generators' do
-        pending 'figuring out what to do about this, including deciding whether or not this is even important' do
-          @class.generator_for :blah do |prev| 'blah'; end
-          # p @class
-          # p @subclass
-          # @subclass.send(:gather_exemplars)
-          # p @subclass.generators
+      it 'should use generators from the parent class' do
+        @subclass.spawn.other.should == 'bang'
+        @subclass.spawn.blah.should  == 'blah'
+      end
+      
+      describe 'with subclass generators' do
+        before :each do
           @subclass.generator_for :blah do |prev| 'blip'; end
-          # @subclass.send(:gather_exemplars)
-          # p @subclass.generators
-          # p @subclass.generators[:blah][:generator][:block].call
-          # @subclass.send(:gather_exemplars)
+        end
+        
+        it 'should still use generators from the parent class' do
+          @subclass.spawn.other.should == 'bang'
+        end
+        
+        it 'should allow overriding parent generators' do
           @subclass.spawn.blah.should == 'blip'
         end
       end
