@@ -1,8 +1,10 @@
 Object Daddy
 ============
-_Version 0.4.3 (February 5, 2010)_
+_Version 0.5.0 (May 15, 2011)_
 
 __Authors:__  [Rick Bradley](mailto:blogicx@rickbradley.com), [Yossef Mendelssohn](mailto:ymendel@pobox.com)
+
+__Contributors:__  [Jeremy Holland](mailto:jeremy@jeremypholland.com) -- Rails 3 Compatibility
 
 __Copyright:__  Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
 
@@ -21,36 +23,22 @@ See [http://b.logi.cx/2007/11/26/object-daddy](http://b.logi.cx/2007/11/26/objec
 
 ## Installation
 
-
-## As Gem
-
-  sudo gem install object_daddy
-
-config/enviroments/test.rb
-
-  gem.config "object_daddy"
-
-
-## As Plugin
-
 Presuming your version of Rails has git plugin installation support:
 
-  script/plugin install git://github.com/flogic/object_daddy.git
+    rails/plugin install git://github.com/awebneck/object_daddy.git
 
 Otherwise, you can install object_daddy by hand:
 
 1. Unpack the object_daddy directory into vendor/plugins/ in your rails project.
 2. Run the object_daddy/install.rb Ruby script.
 
-
 ## Testing
 
-Install the rspec gem and cd into the object_daddy directory. Type `spec
+Install the rspec gem and cd into the object_daddy directory. Type `rspec
 spec/` and you should see all specs run successfully. If you have autotest
 from the ZenTest gem installed you can run autotest in that directory.
 
 ## Using Object Daddy
-
 
 Object Daddy adds a `.generate` method to every ActiveRecord model which can be
 called to generate a valid instance object of that model class, for use in

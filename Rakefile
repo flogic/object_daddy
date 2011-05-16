@@ -1,20 +1,6 @@
 require 'rake'
 require 'rake/testtask'
 require 'yaml'
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |s|
-    s.name = "object_daddy"
-    s.summary = "Object Daddy"
-    s.description = "Fixture killer"
-    s.authors = ['Rick Bradley', 'Yossef Mendelssohn']
-    s.email = 'blogicx@rickbradley.com', 'ymendel@pobox.com'
-    s.homepage = 'http://github.com/flogic/object_daddy'
-    s.files = FileList["[A-Z]*.*", "*.rb", "{lib,rails,spec}/**/*"]
-  end
-rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickels-jeweler -s http://gems.github.com"
-end
 
 require 'rspec/core/rake_task'
 
