@@ -268,7 +268,7 @@ describe ObjectDaddy, "when spawning a class instance" do
   before(:each) do
     @class = Class.new(OpenStruct)
     @class.send(:include, ObjectDaddy)
-    @file_path = File.join(File.dirname(__FILE__), 'tmp')
+    @file_path = [File.join(File.dirname(__FILE__), 'tmp')]
     @file_name = File.join(@file_path, 'widget_exemplar.rb')
     @class.stubs(:exemplar_path).returns(@file_path)
     @class.stubs(:name).returns('Widget')
@@ -444,7 +444,7 @@ describe ObjectDaddy, "when spawning a class instance" do
       Widget = Class.new(OpenStruct) { include ObjectDaddy }
       SubWidget = Class.new(Widget) {include ObjectDaddy }
       Widget.stubs(:exemplar_path).returns(@file_path)
-      SubWidget.stubs(:exemplar_path).returns(File.join(@file_path, 'sub_widget_exemplar.rb'))
+      SubWidget.stubs(:exemplar_path).returns([File.join(@file_path, 'sub_widget_exemplar.rb')])
     end
 
     after :each do
@@ -491,7 +491,7 @@ describe ObjectDaddy, "when spawning a class instance" do
     before :each do
       @subclass = Class.new(@class)
       @subclass.send(:include, ObjectDaddy)
-      @subfile_path = File.join(File.dirname(__FILE__), 'tmp')
+      @subfile_path = [File.join(File.dirname(__FILE__), 'tmp')]
       @subfile_name = File.join(@file_path, 'sub_widget_exemplar.rb')
       @subclass.stubs(:exemplar_path).returns(@file_path)
       @subclass.stubs(:name).returns('SubWidget')
@@ -655,41 +655,41 @@ if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
     
     describe 'giving an exemplar path for an ActiveRecord model' do
       it 'should check if a spec directory exists' do
-        File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec'))
-        File.expects(:directory?).with(File.join(RAILS_ROOT, 'test'))
+        File.expects(:directory?).with(File.join(Rails.root, 'spec'))
+        File.expects(:directory?).with(File.join(Rails.root, 'test'))
         Frobnitz.exemplar_path.should == []
       end
       
       describe 'if a spec directory exists' do
         before :each do
-          File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec')).returns(true)
-          File.expects(:directory?).with(File.join(RAILS_ROOT, 'test')).returns(false)
+          File.expects(:directory?).with(File.join(Rails.root, 'spec')).returns(true)
+          File.expects(:directory?).with(File.join(Rails.root, 'test')).returns(false)
         end
         
         it 'should return the spec directory string in an array' do
-          Frobnitz.exemplar_path.should == [File.join(RAILS_ROOT, 'spec', 'exemplars')]
+          Frobnitz.exemplar_path.should == [File.join(Rails.root, 'spec', 'exemplars')]
         end
       end
       
       describe 'if a spec directory does not exist' do
         before :each do
-          File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec')).returns(false)
-          File.expects(:directory?).with(File.join(RAILS_ROOT, 'test')).returns(true)
+          File.expects(:directory?).with(File.join(Rails.root, 'spec')).returns(false)
+          File.expects(:directory?).with(File.join(Rails.root, 'test')).returns(true)
         end
         
         it 'should return the test directory string in an array' do
-          Frobnitz.exemplar_path.should == [File.join(RAILS_ROOT, 'test', 'exemplars')]
+          Frobnitz.exemplar_path.should == [File.join(Rails.root, 'test', 'exemplars')]
         end
       end
 
       describe 'if both directories exist' do
         before :each do
-          File.expects(:directory?).with(File.join(RAILS_ROOT, 'spec')).returns(true)
-          File.expects(:directory?).with(File.join(RAILS_ROOT, 'test')).returns(true)
+          File.expects(:directory?).with(File.join(Rails.root, 'spec')).returns(true)
+          File.expects(:directory?).with(File.join(Rails.root, 'test')).returns(true)
         end
         
         it 'should return both directory strings in an array' do
-          Frobnitz.exemplar_path.should == [ File.join(RAILS_ROOT, 'spec', 'exemplars'), File.join(RAILS_ROOT, 'test', 'exemplars')]
+          Frobnitz.exemplar_path.should == [ File.join(Rails.root, 'spec', 'exemplars'), File.join(Rails.root, 'test', 'exemplars')]
         end
       end
 

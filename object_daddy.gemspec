@@ -21,12 +21,10 @@ Gem::Specification.new do |s|
      "init.rb",
      "install.rb",
      "lib/object_daddy.rb",
-     "rails/init.rb",
      "spec/install_spec.rb",
      "spec/object_daddy_spec.rb",
      "spec/resources/config/database.yml",
      "spec/resources/schema",
-     "spec/spec.opts",
      "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/flogic/object_daddy}
