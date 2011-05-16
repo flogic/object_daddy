@@ -175,8 +175,8 @@ module ObjectDaddy
         
         belongs_to_associations = reflect_on_all_associations(:belongs_to).to_a
         missing = belongs_to_associations.select { |a|  req[a.name.to_s] or req[a.primary_key_name.to_s] }
-        if create_scope = scope(:create)
-          missing.reject! { |a|   create_scope.include?(a.primary_key_name) }
+        if scope = current_scoped_methods
+          missing.reject! { |a| scope.scope_for_create.include?(a.primary_key_name) }
         end
         missing.reject! { |a|  [a.name, a.primary_key_name].any? { |n|  args.stringify_keys.include?(n.to_s) } }
         missing.each {|a| args[a.name] = a.class_name.constantize.generate }
@@ -187,8 +187,8 @@ module ObjectDaddy
   module RailsClassMethods
     def exemplar_path
       paths = ['spec', 'test'].inject([]) do |array, dir|
-        if File.directory?(File.join(RAILS_ROOT, dir))
-          array << File.join(RAILS_ROOT, dir, 'exemplars')
+        if File.directory?(File.join(Rails.root, dir))
+          array << File.join(Rails.root, dir, 'exemplars')
         end
         array
       end

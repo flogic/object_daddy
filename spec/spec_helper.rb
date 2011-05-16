@@ -1,8 +1,9 @@
 require 'rubygems'
-require 'activerecord'
+require 'active_record'
+
 $:.unshift(File.dirname(__FILE__) + '/../lib/')
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.mock_with :mocha
 end
 
