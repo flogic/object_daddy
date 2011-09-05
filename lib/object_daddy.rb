@@ -3,20 +3,22 @@ module ObjectDaddy
   def self.included(klass)
     klass.extend ClassMethods
     if defined? ActiveRecord and klass < ActiveRecord::Base
-      klass.extend RailsClassMethods    
-      
+      klass.extend RailsClassMethods
+
       class << klass
         alias_method :validates_presence_of_without_object_daddy, :validates_presence_of
         alias_method :validates_presence_of, :validates_presence_of_with_object_daddy
-      end   
+        alias_method :validates_without_object_daddy, :validates
+        alias_method :validates, :validates_with_object_daddy
+      end
     end
   end
-    
+
   module ClassMethods
     attr_accessor :exemplars_generated, :exemplar_path, :generators
     attr_reader :presence_validated_attributes
     protected :exemplars_generated=
-    
+
     # :call-seq:
     #   spawn()
     #   spawn() do |obj| ... end
@@ -55,9 +57,9 @@ module ObjectDaddy
         handle = gen_data.keys.first
         args = gen_data[handle]
       end
-      
+
       raise ArgumentError, "an attribute name must be specified" unless handle = handle.to_sym
-      
+
       unless args.is_a?(Hash)
         unless block
           retval = args
@@ -65,11 +67,11 @@ module ObjectDaddy
         end
         args = {}  # args is assumed to be a hash for the rest of the method
       end
-      
+
       if args[:start]
         block ||= lambda { |prev|  prev.succ }
       end
-      
+
       if args[:method]
         h = { :method => args[:method].to_sym }
         h[:start] = args[:start] if args[:start]
@@ -90,10 +92,10 @@ module ObjectDaddy
     def generates_subclass(subclass_name)
       @concrete_subclass_name = subclass_name.to_s
     end
-    
+
     def gather_exemplars
       return if exemplars_generated
-      
+
       self.generators ||= {}
       if superclass.respond_to?(:gather_exemplars)
         superclass.gather_exemplars
@@ -104,10 +106,10 @@ module ObjectDaddy
         path = File.join(raw_path, "#{underscore(name)}_exemplar.rb")
         load(path) if File.exists?(path)
       end
-      
+
       self.exemplars_generated = true
     end
-    
+
     def presence_validated_attributes
       @presence_validated_attributes ||= {}
       attrs = @presence_validated_attributes
@@ -116,26 +118,26 @@ module ObjectDaddy
       end
       attrs
     end
-    
+
   protected
-  
+
     # we define an underscore helper ourselves since the ActiveSupport isn't available if we're not using Rails
     def underscore(string)
       string.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
     end
-    
+
     def record_generator_for(handle, generator)
       self.generators ||= {}
       raise ArgumentError, "a generator for attribute [:#{handle}] has already been specified" if (generators[handle] || {})[:source] == self
       generators[handle] = { :generator => generator, :source => self }
     end
-  
+
   private
-    
+
     def generate_values(args)
       (generators || {}).each_pair do |handle, gen_data|
         next if args.include?(handle) or args.include?(handle.to_s)
-        
+
         generator = gen_data[:generator]
         if generator[:block]
           process_generated_value(args, handle, generator, generator[:block])
@@ -150,10 +152,10 @@ module ObjectDaddy
           args[handle] = generator[:class].next
         end
       end
-      
+
       generate_missing(args)
     end
-    
+
     def process_generated_value(args, handle, generator, block)
       if generator[:start]
         value = generator[:start]
@@ -167,23 +169,25 @@ module ObjectDaddy
       end
       generator[:prev] = args[handle] = value
     end
-    
+
     def generate_missing(args)
       if presence_validated_attributes and !presence_validated_attributes.empty?
         req = {}
         (presence_validated_attributes.keys - args.keys).each {|a| req[a.to_s] = true } # find attributes required by validates_presence_of not already set
-        
+
         belongs_to_associations = reflect_on_all_associations(:belongs_to).to_a
-        missing = belongs_to_associations.select { |a|  req[a.name.to_s] or req[a.primary_key_name.to_s] }
-        if scope = current_scoped_methods
-          missing.reject! { |a| scope.scope_for_create.include?(a.primary_key_name) }
+        fk_method = Rails.version >= "3.1.0" ? :foreign_key : :primary_key_name
+        missing = belongs_to_associations.select { |a|  req[a.name.to_s] or req[a.send(fk_method).to_s] }
+        # Rails 3.1 compatibility jazz - current_scoped_methods was deprecated.
+        if scope = respond_to?(:current_scoped_methods) ? current_scoped_methods : current_scope
+          missing.reject! { |a| scope.scope_for_create.include?(a.send(fk_method)) }
         end
-        missing.reject! { |a|  [a.name, a.primary_key_name].any? { |n|  args.stringify_keys.include?(n.to_s) } }
+        missing.reject! { |a|  [a.name, a.send(fk_method)].any? { |n|  args.stringify_keys.include?(n.to_s) } }
         missing.each {|a| args[a.name] = a.class_name.constantize.generate }
       end
     end
   end
-  
+
   module RailsClassMethods
     def exemplar_path
       paths = ['spec', 'test'].inject([]) do |array, dir|
@@ -193,7 +197,7 @@ module ObjectDaddy
         array
       end
     end
-    
+
     def validates_presence_of_with_object_daddy(*attr_names)
       @presence_validated_attributes ||= {}
       new_attr = attr_names.dup
@@ -201,7 +205,15 @@ module ObjectDaddy
       new_attr.each {|a| @presence_validated_attributes[a] = true }
       validates_presence_of_without_object_daddy(*attr_names)
     end
-    
+
+    def validates_with_object_daddy(*args)
+      if args.last.is_a?(Hash) && args.last[:presence]
+        @presence_validated_attributes ||= {}
+        @presence_validated_attributes[args.first] = true
+        validates_without_object_daddy(*args)
+      end
+    end
+
     # :call-seq:
     #   generate()
     #   generate() do |obj| ... end
@@ -219,7 +231,7 @@ module ObjectDaddy
         yield instance if block_given?
       end
     end
-    
+
     # :call-seq:
     #   generate()
     #   generate() do |obj| ... end
