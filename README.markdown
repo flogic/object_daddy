@@ -1,10 +1,10 @@
 Object Daddy
 ============
-_Version 0.5.1 (September 4, 2011)_
+_Version 1.0.0 (April 6, 2012)_
 
-__Authors:__  [Rick Bradley](mailto:blogicx@rickbradley.com), [Yossef Mendelssohn](mailto:ymendel@pobox.com)
+__Authors:__  [Rick Bradley](mailto:blogicx@rickbradley.com), [Yossef Mendelssohn](mailto:ymendel@pobox.com), [Jeremy Holland](mailto:jeremy@jeremypholland.com)
 
-__Contributors:__  [Jeremy Holland](mailto:jeremy@jeremypholland.com) -- Rails 3 Compatibility
+__Gem Maintainer:__  [Jeremy Holland](mailto:jeremy@jeremypholland.com)
 
 __Copyright:__  Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
 
@@ -23,20 +23,13 @@ See [http://b.logi.cx/2007/11/26/object-daddy](http://b.logi.cx/2007/11/26/objec
 
 ## Installation
 
-Presuming your version of Rails has git plugin installation support:
+Add the following to your Gemfile and run `bundle install`
 
-    rails/plugin install git://github.com/awebneck/object_daddy.git
+    group :development, :test do
+      gem 'object-daddy'
+    end
 
-Otherwise, you can install object_daddy by hand:
-
-1. Unpack the object_daddy directory into vendor/plugins/ in your rails project.
-2. Run the object_daddy/install.rb Ruby script.
-
-## Testing
-
-Install the rspec gem and cd into the object_daddy directory. Type `rspec
-spec/` and you should see all specs run successfully. If you have autotest
-from the ZenTest gem installed you can run autotest in that directory.
+Once installed, to set up your exemplars directory, run `rails g object-daddy`
 
 ## Using Object Daddy
 
@@ -62,7 +55,7 @@ make the main model valid. E.g., given the following models:
 
     class User < ActiveRecord::Base
       belongs_to :login
-      validates_presence_of :login
+      validates :login, :presence => true
     end
 
     class Login < ActiveRecord::Base
@@ -88,12 +81,17 @@ the means of finding a value for the associated attribute: a block, a method
 call, or using a generator class.
 
     class User < ActiveRecord::Base
-      validates_presence_of :email
-      validates_uniqueness_of :email
-      validates_format_of :email,
-      :with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
-      validates_presence_of :username
-      validates_format_of :username, :with => /^[a-z0-9_]{4,12}$/i
+      validates :email,
+        :presence => true,
+        :uniqueness => true,
+        :format => {
+          :with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
+        }
+      validates :username,
+        :presence => true,
+        :format => {
+          :with => /^[a-z0-9_]{4,12}$/i
+        }
 
       generator_for :email, :start => 'test@domain.com' do |prev|
         user, domain = prev.split('@')
@@ -177,7 +175,7 @@ will provide a place where model classes can be re-opened and `generator_for`
 calls (and support methods) can be written without polluting the model files
 with Object Daddy information.
 
-Object Daddy, when installed as a Rails plugin, will create
+when the Object Daddy generator is run, it will create
 *RAILS_ROOT/spec/exemplars/* as a place to hold __exemplar__ files for Rails model
 classes.  (We are seeking perhaps some better terminology)
 
@@ -294,7 +292,7 @@ but only if necessary.
 
     class Item < ActiveRecord::Base
       belongs_to :category
-      validates_presence_of :category
+      validates :category, :presence => true
     end
 
 `Item.generate` will generate a new category, but `some_category.items.generate` will not.

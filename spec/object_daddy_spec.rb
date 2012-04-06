@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'ostruct'
-require 'object_daddy'
+require 'object-daddy'
 
 describe ObjectDaddy, "when included into a class" do
   before(:each) do
