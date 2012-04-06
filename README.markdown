@@ -8,7 +8,7 @@ __Gem Maintainer:__  [Jeremy Holland](mailto:jeremy@jeremypholland.com)
 
 __Copyright:__  Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
 
-__License:__  MIT License.  See MIT-LICENSE file for more details.
+__License:__  MIT License.  See LICENSE.txt file for more details.
 
 Object Daddy is a library (as well as a Ruby on Rails plugin) designed to
 assist in automating testing of large collections of objects, especially webs
