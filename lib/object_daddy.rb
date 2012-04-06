@@ -210,8 +210,8 @@ module ObjectDaddy
       if args.last.is_a?(Hash) && args.last[:presence]
         @presence_validated_attributes ||= {}
         @presence_validated_attributes[args.first] = true
-        validates_without_object_daddy(*args)
       end
+      validates_without_object_daddy(*args)
     end
 
     # :call-seq:
