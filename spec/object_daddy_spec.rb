@@ -565,460 +565,460 @@ describe ObjectDaddy, "when spawning a class instance" do
   end
 end
 
-# conditionally do Rails tests, if we were included as a plugin
-if File.exists?("#{File.dirname(__FILE__)}/../../../../config/environment.rb")
+setup_rails_database
 
-  setup_rails_database
+class Foo < ActiveRecord::Base
+  has_many :frobnitzes, :class_name => 'Frobnitz'
+end
 
-  class Foo < ActiveRecord::Base
-    has_many :frobnitzes, :class_name => 'Frobnitz'
+class Baz < ActiveRecord::Base
+  has_many :frobnitzes, :class_name => 'Frobnitz'
+end
+
+class Bar < ActiveRecord::Base
+end
+
+class Thing < ActiveRecord::Base
+  has_many :frobnitzes, :class_name => 'Frobnitz'
+end
+
+class Splort < ActiveRecord::Base
+  has_many :frobnitzes, :class_name => 'Frobnitz'
+end
+
+class Frobnitz < ActiveRecord::Base
+  belongs_to :foo
+  belongs_to :baz
+  belongs_to :bar
+  belongs_to :thing
+  belongs_to :splort
+  belongs_to :bango, :class_name => 'Blah', :foreign_key => 'bangbang_id'
+  belongs_to :plunk, :class_name => 'Boog', :foreign_key => 'wakka_id'
+  belongs_to :blotto, :class_name => 'YaModel', :foreign_key => 'blitblot_id'
+  belongs_to :biscuit, :class_name => 'Cork', :foreign_key => 'poolie_id'
+  validates_presence_of :foo
+  validates :baz, :presence => true
+  validates_presence_of :thing_id
+  validates :splort_id, :presence => true
+  validates_presence_of :bangbang_id
+  validates :wakka_id, :presence => true
+  validates_presence_of :blotto
+  validates :biscuit, :presence => true
+  validates_presence_of :name
+  validates_presence_of :title, :on => :create, :message => "can't be blank"
+  validates_format_of   :title, :with => /^\d+$/
+end
+
+class SubFrobnitz < Frobnitz
+  validates_presence_of :bar
+end
+
+class Boog < ActiveRecord::Base
+end
+
+class Blah < ActiveRecord::Base
+end
+
+class YaModel < ActiveRecord::Base
+end
+
+class Cork < ActiveRecord::Base
+end
+
+class ProtectedAttribute < ActiveRecord::Base
+  attr_accessible :public_name
+end
+
+describe ObjectDaddy, "when integrated with Rails" do
+  before :each do
+    Rails.stubs(:root).returns("somedir")
   end
 
-  class Baz < ActiveRecord::Base
-    has_many :frobnitzes, :class_name => 'Frobnitz'
+  it "should provide a means of generating and saving a class instance" do
+    Frobnitz.should respond_to(:generate)
   end
   
-  class Bar < ActiveRecord::Base
+  it "should provide a means of generating and saving a class instance while raising exceptions" do
+    Frobnitz.should respond_to(:generate!)
   end
   
-  class Thing < ActiveRecord::Base
-    has_many :frobnitzes, :class_name => 'Frobnitz'
-  end
-  
-  class Splort < ActiveRecord::Base
-    has_many :frobnitzes, :class_name => 'Frobnitz'
-  end
-
-  class Frobnitz < ActiveRecord::Base
-    belongs_to :foo
-    belongs_to :baz
-    belongs_to :bar
-    belongs_to :thing
-    belongs_to :splort
-    belongs_to :bango, :class_name => 'Blah', :foreign_key => 'bangbang_id'
-    belongs_to :plunk, :class_name => 'Boog', :foreign_key => 'wakka_id'
-    belongs_to :blotto, :class_name => 'YaModel', :foreign_key => 'blitblot_id'
-    belongs_to :biscuit, :class_name => 'Cork', :foreign_key => 'poolie_id'
-    validates_presence_of :foo
-    validates :baz, :presence => true
-    validates_presence_of :thing_id
-    validates :splort_id, :presence => true
-    validates_presence_of :bangbang_id
-    validates :wakka_id, :presence => true
-    validates_presence_of :blotto
-    validates :biscuit, :presence => true
-    validates_presence_of :name
-    validates_presence_of :title, :on => :create, :message => "can't be blank"
-    validates_format_of   :title, :with => /^\d+$/
-  end
-  
-  class SubFrobnitz < Frobnitz
-    validates_presence_of :bar
-  end
-  
-  class Boog < ActiveRecord::Base
-  end
-  
-  class Blah < ActiveRecord::Base
-  end
-  
-  class YaModel < ActiveRecord::Base
-  end
-  
-  class Cork < ActiveRecord::Base
-  end
-
-  class ProtectedAttribute < ActiveRecord::Base
-    attr_accessible :public_name
-  end
-
-  describe ObjectDaddy, "when integrated with Rails" do
-    it "should provide a means of generating and saving a class instance" do
-      Frobnitz.should respond_to(:generate)
-    end
-    
-    it "should provide a means of generating and saving a class instance while raising exceptions" do
-      Frobnitz.should respond_to(:generate!)
-    end
-    
-    describe "and a block is passed to generate" do
-      it "should yield the instance to the block" do
-        yielded_object = nil
-        YaModel.generate do |obj|
-          yielded_object = obj
-        end
-        YaModel.should === yielded_object
+  describe "and a block is passed to generate" do
+    it "should yield the instance to the block" do
+      yielded_object = nil
+      YaModel.generate do |obj|
+        yielded_object = obj
       end
-
-      it "should save the instance before yielding" do
-        instance = Frobnitz.new
-        YaModel.generate do |obj|
-          obj.should_not be_new_record
-        end
-      end
+      YaModel.should === yielded_object
     end
-    
-    describe "and a block is passed to generate!" do
-      it "should yield the instance to the block" do
-        yielded_object = nil
-        YaModel.generate! do |obj|
-          yielded_object = obj
-        end
-        YaModel.should === yielded_object
-      end
 
-      it "should save the instance before yielding" do
-        instance = Frobnitz.new
-        YaModel.generate! do |obj|
-          obj.should_not be_new_record
-        end
+    it "should save the instance before yielding" do
+      instance = Frobnitz.new
+      YaModel.generate do |obj|
+        obj.should_not be_new_record
       end
     end
+  end
+  
+  describe "and a block is passed to generate!" do
+    it "should yield the instance to the block" do
+      yielded_object = nil
+      YaModel.generate! do |obj|
+        yielded_object = obj
+      end
+      YaModel.should === yielded_object
+    end
+
+    it "should save the instance before yielding" do
+      instance = Frobnitz.new
+      YaModel.generate! do |obj|
+        obj.should_not be_new_record
+      end
+    end
+  end
+  
+  describe 'giving an exemplar path for an ActiveRecord model' do
+    it 'should check if a spec directory exists' do
+      File.expects(:directory?).with(File.join(Rails.root, 'spec'))
+      File.expects(:directory?).with(File.join(Rails.root, 'test'))
+      Frobnitz.exemplar_path.should == []
+    end
     
-    describe 'giving an exemplar path for an ActiveRecord model' do
-      it 'should check if a spec directory exists' do
-        File.expects(:directory?).with(File.join(Rails.root, 'spec'))
-        File.expects(:directory?).with(File.join(Rails.root, 'test'))
-        Frobnitz.exemplar_path.should == []
+    describe 'if a spec directory exists' do
+      before :each do
+        File.expects(:directory?).with(File.join(Rails.root, 'spec')).returns(true)
+        File.expects(:directory?).with(File.join(Rails.root, 'test')).returns(false)
       end
       
-      describe 'if a spec directory exists' do
-        before :each do
-          File.expects(:directory?).with(File.join(Rails.root, 'spec')).returns(true)
-          File.expects(:directory?).with(File.join(Rails.root, 'test')).returns(false)
-        end
-        
-        it 'should return the spec directory string in an array' do
-          Frobnitz.exemplar_path.should == [File.join(Rails.root, 'spec', 'exemplars')]
-        end
+      it 'should return the spec directory string in an array' do
+        Frobnitz.exemplar_path.should == [File.join(Rails.root, 'spec', 'exemplars')]
+      end
+    end
+    
+    describe 'if a spec directory does not exist' do
+      before :each do
+        File.expects(:directory?).with(File.join(Rails.root, 'spec')).returns(false)
+        File.expects(:directory?).with(File.join(Rails.root, 'test')).returns(true)
       end
       
-      describe 'if a spec directory does not exist' do
-        before :each do
-          File.expects(:directory?).with(File.join(Rails.root, 'spec')).returns(false)
-          File.expects(:directory?).with(File.join(Rails.root, 'test')).returns(true)
-        end
-        
-        it 'should return the test directory string in an array' do
-          Frobnitz.exemplar_path.should == [File.join(Rails.root, 'test', 'exemplars')]
-        end
+      it 'should return the test directory string in an array' do
+        Frobnitz.exemplar_path.should == [File.join(Rails.root, 'test', 'exemplars')]
       end
-
-      describe 'if both directories exist' do
-        before :each do
-          File.expects(:directory?).with(File.join(Rails.root, 'spec')).returns(true)
-          File.expects(:directory?).with(File.join(Rails.root, 'test')).returns(true)
-        end
-        
-        it 'should return both directory strings in an array' do
-          Frobnitz.exemplar_path.should == [ File.join(Rails.root, 'spec', 'exemplars'), File.join(Rails.root, 'test', 'exemplars')]
-        end
-      end
-
-    end
-    
-    describe 'when an association is required by name' do
-      context "when required by validates_presence_of" do
-        it 'should generate an instance for the association' do
-          foo = Foo.create(:name => 'some foo')
-          Foo.expects(:generate).returns(foo)
-          Frobnitz.spawn
-        end
-        
-        it 'should assign an instance for the association' do
-          foo = Foo.create(:name => 'some foo')
-          Foo.stubs(:generate).returns(foo)
-          Frobnitz.spawn.foo.should == foo
-        end
-        
-        it 'should generate an instance for the association using specified foreign key and class name values' do
-          ya_model = YaModel.create(:name => 'ya model')
-          YaModel.expects(:generate).returns(ya_model)
-          Frobnitz.spawn
-        end
-        
-        it 'should assign an instance for the association using specified foreign key and class name values' do
-          ya_model = YaModel.create(:name => 'ya model')
-          YaModel.stubs(:generate).returns(ya_model)
-          Frobnitz.spawn.blotto.should == ya_model
-        end
-        
-        it 'should use the parent object when generating an instance through a has_many association' do
-          foo  = Foo.create(:name => 'some foo')
-          frob = foo.frobnitzes.generate
-          frob.foo.should == foo
-        end
-        
-        it 'should not generate an instance if the attribute is overridden by nil' do
-          Foo.expects(:generate).never
-          Frobnitz.spawn(:foo => nil)
-        end
-        
-        it 'should not assign an instance if the attribute is overridden by nil' do
-          Frobnitz.spawn(:foo => nil).foo.should be_nil
-        end
-        
-        it 'should not generate an instance if the attribute (*_id) is overridden' do
-          foo = Foo.create(:name => 'some foo')
-          Foo.expects(:generate).never
-          Frobnitz.spawn(:foo_id => foo.id)
-        end
-        
-        it 'should use the given attribute (*_id) instead of assigning a new association object' do
-          foo = Foo.create(:name => 'some foo')
-          Frobnitz.spawn(:foo_id => foo.id).foo.should == foo
-        end
-      end
-
-      context "when required by validates :presence => true" do
-        it 'should generate an instance for the association' do
-          baz = Baz.create(:name => 'some baz')
-          Baz.expects(:generate).returns(baz)
-          Frobnitz.spawn
-        end
-        
-        it 'should assign an instance for the association' do
-          baz = Baz.create(:name => 'some baz')
-          Baz.stubs(:generate).returns(baz)
-          Frobnitz.spawn.baz.should == baz
-        end
-        
-        it 'should generate an instance for the association using specified foreign key and class name values' do
-          cork = Cork.create(:name => 'ya model')
-          Cork.expects(:generate).returns(cork)
-          Frobnitz.spawn
-        end
-        
-        it 'should assign an instance for the association using specified foreign key and class name values' do
-          cork = Cork.create(:name => 'ya model')
-          Cork.stubs(:generate).returns(cork)
-          Frobnitz.spawn.biscuit.should == cork
-        end
-        
-        it 'should use the parent object when generating an instance through a has_many association' do
-          baz  = Baz.create(:name => 'some baz')
-          frob = baz.frobnitzes.generate
-          frob.baz.should == baz
-        end
-        
-        it 'should not generate an instance if the attribute is overridden by nil' do
-          Baz.expects(:generate).never
-          Frobnitz.spawn(:baz => nil)
-        end
-        
-        it 'should not assign an instance if the attribute is overridden by nil' do
-          Frobnitz.spawn(:baz => nil).baz.should be_nil
-        end
-        
-        it 'should not generate an instance if the attribute (*_id) is overridden' do
-          baz = Baz.create(:name => 'some baz')
-          Baz.expects(:generate).never
-          Frobnitz.spawn(:baz_id => baz.id)
-        end
-        
-        it 'should use the given attribute (*_id) instead of assigning a new association object' do
-          baz = Baz.create(:name => 'some baz')
-          Frobnitz.spawn(:baz_id => baz.id).baz.should == baz
-        end
-      end
-    end
-    
-    describe 'when an association is required by ID' do
-      context "when required by validates_presence_of" do
-        it 'should generate an instance for the association' do
-          thing = Thing.create(:name => 'some thing')
-          Thing.expects(:generate).returns(thing)
-          Frobnitz.spawn
-        end
-        
-        it 'should assign an instance for the association' do
-          thing = Thing.create(:name => 'some thing')
-          Thing.stubs(:generate).returns(thing)
-          Frobnitz.spawn.thing.should == thing
-        end
-        
-        it 'should generate an instance for the association using specified foreign key and class name values' do
-          blah = Blah.create(:bam => 'blah')
-          Blah.expects(:generate).returns(blah)
-          Frobnitz.spawn
-        end
-        
-        it 'should assign an instance for the association using specified foreign key and class name values' do
-          blah = Blah.create(:bam => 'blah')
-          Blah.stubs(:generate).returns(blah)
-          Frobnitz.spawn.bango.should == blah
-        end
-        
-        it 'should use the parent object when generating an instance through a has_many association' do
-          thing = Thing.create(:name => 'some thing')
-          frob  = thing.frobnitzes.generate
-          frob.thing.should == thing
-        end
-        
-        it 'should not generate an instance if the attribute is overridden by nil' do
-          Thing.expects(:generate).never
-          Frobnitz.spawn(:thing_id => nil)
-        end
-        
-        it 'should not assign an instance if the attribute is overridden by nil' do
-          Frobnitz.spawn(:thing_id => nil).thing.should be_nil
-        end
-        
-        it 'should not generate an instance if the association is overridden' do
-          thing = Thing.create(:name => 'some thing')
-          Thing.expects(:generate).never
-          Frobnitz.spawn(:thing => thing)
-        end
-        
-        it 'should use the given association object instead of assigning a new one' do
-          thing = Thing.create(:name => 'some thing')
-          Frobnitz.spawn(:thing => thing).thing.should == thing
-        end
-      end
-
-      context "when required by validates :presence => true" do
-        it 'should generate an instance for the association' do
-          splort = Splort.create(:name => 'some splort')
-          Splort.expects(:generate).returns(splort)
-          Frobnitz.spawn
-        end
-        
-        it 'should assign an instance for the association' do
-          splort = Splort.create(:name => 'some splort')
-          Splort.stubs(:generate).returns(splort)
-          Frobnitz.spawn.splort.should == splort
-        end
-        
-        it 'should generate an instance for the association using specified foreign key and class name values' do
-          blah = Boog.create(:bam => 'blah')
-          Boog.expects(:generate).returns(blah)
-          Frobnitz.spawn
-        end
-        
-        it 'should assign an instance for the association using specified foreign key and class name values' do
-          blah = Boog.create(:bam => 'blah')
-          Boog.stubs(:generate).returns(blah)
-          Frobnitz.spawn.plunk.should == blah
-        end
-        
-        it 'should use the parent object when generating an instance through a has_many association' do
-          splort = Splort.create(:name => 'some splort')
-          frob  = splort.frobnitzes.generate
-          frob.splort.should == splort
-        end
-        
-        it 'should not generate an instance if the attribute is overridden by nil' do
-          Splort.expects(:generate).never
-          Frobnitz.spawn(:splort_id => nil)
-        end
-        
-        it 'should not assign an instance if the attribute is overridden by nil' do
-          Frobnitz.spawn(:splort_id => nil).splort.should be_nil
-        end
-        
-        it 'should not generate an instance if the association is overridden' do
-          splort = Splort.create(:name => 'some splort')
-          Splort.expects(:generate).never
-          Frobnitz.spawn(:splort => splort)
-        end
-        
-        it 'should use the given association object instead of assigning a new one' do
-          splort = Splort.create(:name => 'some splort')
-          Frobnitz.spawn(:splort => splort).splort.should == splort
-        end
-      end
-    end
-    
-    it 'should handle a belongs_to association required through inheritance' do
-      thing = Thing.create(:name => 'some thing')
-      Thing.expects(:generate).returns(thing)
-      SubFrobnitz.spawn
-    end
-    
-    it 'should include belongs_to associations required by the subclass' do
-      bar = Bar.create
-      Bar.expects(:generate).returns(bar)
-      SubFrobnitz.spawn
-    end
-    
-    it 'should not include belongs_to associations required by the subclass at the parent class level' do
-      Bar.expects(:generate).never
-      Frobnitz.spawn
-    end
-    
-    it "should not generate instances of belongs_to associations which are not required by a presence_of validator" do
-      Bar.expects(:generate).never
-      Frobnitz.spawn
-    end
-    
-    it "should not generate any values for attributes that do not have generators" do
-      Frobnitz.spawn.name.should be_nil
     end
 
-    it "should use specified values for attributes that do not have generators" do
-      Frobnitz.spawn(:name => 'test').name.should == 'test'
-    end
-    
-    it "should use specified values for attributes that would otherwise be generated" do
-      Foo.expects(:generate).never
-      foo = Foo.new
-      Frobnitz.spawn(:foo => foo).foo.should == foo
-    end
-    
-    it 'should pass the supplied validator options to the real validator method' do
-      Blah.validates_presence_of :bam, :if => lambda { false }
-      Blah.new.should be_valid
-    end
-    
-    it "should ignore optional arguments to presence_of validators" do
-      Frobnitz.presence_validated_attributes.should have_key(:title)
-    end
-    
-    it "should return an unsaved record if spawning" do
-      Thing.spawn.should be_new_record
-    end
-    
-    it "should return a saved record if generating" do
-      Thing.generate.should_not be_new_record
-    end
-    
-    it 'should return a saved record if generating while raising exceptions' do
-      Thing.generate!.should_not be_new_record
-    end
-    
-    it "should not fail if trying to generate and save an invalid object" do
-      lambda { Frobnitz.generate(:title => 'bob') }.should_not raise_error(ActiveRecord::RecordInvalid)
-    end
-    
-    it "should return an invalid object if trying to generate and save an invalid object" do
-      Frobnitz.generate(:title => 'bob').should_not be_valid
-    end
-    
-    it "should fail if trying to generate and save an invalid object while raising acceptions" do
-      lambda { Frobnitz.generate!(:title => 'bob') }.should raise_error(ActiveRecord::RecordInvalid)
-    end
-    
-    it "should return a valid object if generate and save succeeds" do
-      Frobnitz.generate(:title => '5', :name => 'blah').should be_valid
-    end
-    
-    it 'should allow attributes to be overriden with string keys' do
-      Frobnitz.generator_for :name => 'thing'
-      Frobnitz.generate('name' => 'boo').name.should == 'boo'
+    describe 'if both directories exist' do
+      before :each do
+        File.expects(:directory?).with(File.join(Rails.root, 'spec')).returns(true)
+        File.expects(:directory?).with(File.join(Rails.root, 'test')).returns(true)
+      end
+      
+      it 'should return both directory strings in an array' do
+        Frobnitz.exemplar_path.should == [ File.join(Rails.root, 'spec', 'exemplars'), File.join(Rails.root, 'test', 'exemplars')]
+      end
     end
 
-    describe "supporting mass-assignment protected attributes" do
-      it "should allow setting a value for a non-protected attribute" do
-        ProtectedAttribute.generate!(:public_name => 'no_worries').public_name.should == 'no_worries'
+  end
+  
+  describe 'when an association is required by name' do
+    context "when required by validates_presence_of" do
+      it 'should generate an instance for the association' do
+        foo = Foo.create(:name => 'some foo')
+        Foo.expects(:generate).returns(foo)
+        Frobnitz.spawn
       end
+      
+      it 'should assign an instance for the association' do
+        foo = Foo.create(:name => 'some foo')
+        Foo.stubs(:generate).returns(foo)
+        Frobnitz.spawn.foo.should == foo
+      end
+      
+      it 'should generate an instance for the association using specified foreign key and class name values' do
+        ya_model = YaModel.create(:name => 'ya model')
+        YaModel.expects(:generate).returns(ya_model)
+        Frobnitz.spawn
+      end
+      
+      it 'should assign an instance for the association using specified foreign key and class name values' do
+        ya_model = YaModel.create(:name => 'ya model')
+        YaModel.stubs(:generate).returns(ya_model)
+        Frobnitz.spawn.blotto.should == ya_model
+      end
+      
+      it 'should use the parent object when generating an instance through a has_many association' do
+        foo  = Foo.create(:name => 'some foo')
+        frob = foo.frobnitzes.generate
+        frob.foo.should == foo
+      end
+      
+      it 'should not generate an instance if the attribute is overridden by nil' do
+        Foo.expects(:generate).never
+        Frobnitz.spawn(:foo => nil)
+      end
+      
+      it 'should not assign an instance if the attribute is overridden by nil' do
+        Frobnitz.spawn(:foo => nil).foo.should be_nil
+      end
+      
+      it 'should not generate an instance if the attribute (*_id) is overridden' do
+        foo = Foo.create(:name => 'some foo')
+        Foo.expects(:generate).never
+        Frobnitz.spawn(:foo_id => foo.id)
+      end
+      
+      it 'should use the given attribute (*_id) instead of assigning a new association object' do
+        foo = Foo.create(:name => 'some foo')
+        Frobnitz.spawn(:foo_id => foo.id).foo.should == foo
+      end
+    end
 
-      it "should have a protected attribute, which is not set when using regular create!" do
-        ProtectedAttribute.create!(:private_name => 'protected name').private_name.should == nil
+    context "when required by validates :presence => true" do
+      it 'should generate an instance for the association' do
+        baz = Baz.create(:name => 'some baz')
+        Baz.expects(:generate).returns(baz)
+        Frobnitz.spawn
       end
+      
+      it 'should assign an instance for the association' do
+        baz = Baz.create(:name => 'some baz')
+        Baz.stubs(:generate).returns(baz)
+        Frobnitz.spawn.baz.should == baz
+      end
+      
+      it 'should generate an instance for the association using specified foreign key and class name values' do
+        cork = Cork.create(:name => 'ya model')
+        Cork.expects(:generate).returns(cork)
+        Frobnitz.spawn
+      end
+      
+      it 'should assign an instance for the association using specified foreign key and class name values' do
+        cork = Cork.create(:name => 'ya model')
+        Cork.stubs(:generate).returns(cork)
+        Frobnitz.spawn.biscuit.should == cork
+      end
+      
+      it 'should use the parent object when generating an instance through a has_many association' do
+        baz  = Baz.create(:name => 'some baz')
+        frob = baz.frobnitzes.generate
+        frob.baz.should == baz
+      end
+      
+      it 'should not generate an instance if the attribute is overridden by nil' do
+        Baz.expects(:generate).never
+        Frobnitz.spawn(:baz => nil)
+      end
+      
+      it 'should not assign an instance if the attribute is overridden by nil' do
+        Frobnitz.spawn(:baz => nil).baz.should be_nil
+      end
+      
+      it 'should not generate an instance if the attribute (*_id) is overridden' do
+        baz = Baz.create(:name => 'some baz')
+        Baz.expects(:generate).never
+        Frobnitz.spawn(:baz_id => baz.id)
+      end
+      
+      it 'should use the given attribute (*_id) instead of assigning a new association object' do
+        baz = Baz.create(:name => 'some baz')
+        Frobnitz.spawn(:baz_id => baz.id).baz.should == baz
+      end
+    end
+  end
+  
+  describe 'when an association is required by ID' do
+    context "when required by validates_presence_of" do
+      it 'should generate an instance for the association' do
+        thing = Thing.create(:name => 'some thing')
+        Thing.expects(:generate).returns(thing)
+        Frobnitz.spawn
+      end
+      
+      it 'should assign an instance for the association' do
+        thing = Thing.create(:name => 'some thing')
+        Thing.stubs(:generate).returns(thing)
+        Frobnitz.spawn.thing.should == thing
+      end
+      
+      it 'should generate an instance for the association using specified foreign key and class name values' do
+        blah = Blah.create(:bam => 'blah')
+        Blah.expects(:generate).returns(blah)
+        Frobnitz.spawn
+      end
+      
+      it 'should assign an instance for the association using specified foreign key and class name values' do
+        blah = Blah.create(:bam => 'blah')
+        Blah.stubs(:generate).returns(blah)
+        Frobnitz.spawn.bango.should == blah
+      end
+      
+      it 'should use the parent object when generating an instance through a has_many association' do
+        thing = Thing.create(:name => 'some thing')
+        frob  = thing.frobnitzes.generate
+        frob.thing.should == thing
+      end
+      
+      it 'should not generate an instance if the attribute is overridden by nil' do
+        Thing.expects(:generate).never
+        Frobnitz.spawn(:thing_id => nil)
+      end
+      
+      it 'should not assign an instance if the attribute is overridden by nil' do
+        Frobnitz.spawn(:thing_id => nil).thing.should be_nil
+      end
+      
+      it 'should not generate an instance if the association is overridden' do
+        thing = Thing.create(:name => 'some thing')
+        Thing.expects(:generate).never
+        Frobnitz.spawn(:thing => thing)
+      end
+      
+      it 'should use the given association object instead of assigning a new one' do
+        thing = Thing.create(:name => 'some thing')
+        Frobnitz.spawn(:thing => thing).thing.should == thing
+      end
+    end
 
-      it "should allow setting a value for a protected attribute" do
-        ProtectedAttribute.generate!(:private_name => 'protected name').private_name.should == 'protected name'
+    context "when required by validates :presence => true" do
+      it 'should generate an instance for the association' do
+        splort = Splort.create(:name => 'some splort')
+        Splort.expects(:generate).returns(splort)
+        Frobnitz.spawn
       end
+      
+      it 'should assign an instance for the association' do
+        splort = Splort.create(:name => 'some splort')
+        Splort.stubs(:generate).returns(splort)
+        Frobnitz.spawn.splort.should == splort
+      end
+      
+      it 'should generate an instance for the association using specified foreign key and class name values' do
+        blah = Boog.create(:bam => 'blah')
+        Boog.expects(:generate).returns(blah)
+        Frobnitz.spawn
+      end
+      
+      it 'should assign an instance for the association using specified foreign key and class name values' do
+        blah = Boog.create(:bam => 'blah')
+        Boog.stubs(:generate).returns(blah)
+        Frobnitz.spawn.plunk.should == blah
+      end
+      
+      it 'should use the parent object when generating an instance through a has_many association' do
+        splort = Splort.create(:name => 'some splort')
+        frob  = splort.frobnitzes.generate
+        frob.splort.should == splort
+      end
+      
+      it 'should not generate an instance if the attribute is overridden by nil' do
+        Splort.expects(:generate).never
+        Frobnitz.spawn(:splort_id => nil)
+      end
+      
+      it 'should not assign an instance if the attribute is overridden by nil' do
+        Frobnitz.spawn(:splort_id => nil).splort.should be_nil
+      end
+      
+      it 'should not generate an instance if the association is overridden' do
+        splort = Splort.create(:name => 'some splort')
+        Splort.expects(:generate).never
+        Frobnitz.spawn(:splort => splort)
+      end
+      
+      it 'should use the given association object instead of assigning a new one' do
+        splort = Splort.create(:name => 'some splort')
+        Frobnitz.spawn(:splort => splort).splort.should == splort
+      end
+    end
+  end
+  
+  it 'should handle a belongs_to association required through inheritance' do
+    thing = Thing.create(:name => 'some thing')
+    Thing.expects(:generate).returns(thing)
+    SubFrobnitz.spawn
+  end
+  
+  it 'should include belongs_to associations required by the subclass' do
+    bar = Bar.create
+    Bar.expects(:generate).returns(bar)
+    SubFrobnitz.spawn
+  end
+  
+  it 'should not include belongs_to associations required by the subclass at the parent class level' do
+    Bar.expects(:generate).never
+    Frobnitz.spawn
+  end
+  
+  it "should not generate instances of belongs_to associations which are not required by a presence_of validator" do
+    Bar.expects(:generate).never
+    Frobnitz.spawn
+  end
+  
+  it "should not generate any values for attributes that do not have generators" do
+    Frobnitz.spawn.name.should be_nil
+  end
+
+  it "should use specified values for attributes that do not have generators" do
+    Frobnitz.spawn(:name => 'test').name.should == 'test'
+  end
+  
+  it "should use specified values for attributes that would otherwise be generated" do
+    Foo.expects(:generate).never
+    foo = Foo.new
+    Frobnitz.spawn(:foo => foo).foo.should == foo
+  end
+  
+  it 'should pass the supplied validator options to the real validator method' do
+    Blah.validates_presence_of :bam, :if => lambda { false }
+    Blah.new.should be_valid
+  end
+  
+  it "should ignore optional arguments to presence_of validators" do
+    Frobnitz.presence_validated_attributes.should have_key(:title)
+  end
+  
+  it "should return an unsaved record if spawning" do
+    Thing.spawn.should be_new_record
+  end
+  
+  it "should return a saved record if generating" do
+    Thing.generate.should_not be_new_record
+  end
+  
+  it 'should return a saved record if generating while raising exceptions' do
+    Thing.generate!.should_not be_new_record
+  end
+  
+  it "should not fail if trying to generate and save an invalid object" do
+    lambda { Frobnitz.generate(:title => 'bob') }.should_not raise_error(ActiveRecord::RecordInvalid)
+  end
+  
+  it "should return an invalid object if trying to generate and save an invalid object" do
+    Frobnitz.generate(:title => 'bob').should_not be_valid
+  end
+  
+  it "should fail if trying to generate and save an invalid object while raising acceptions" do
+    lambda { Frobnitz.generate!(:title => 'bob') }.should raise_error(ActiveRecord::RecordInvalid)
+  end
+  
+  it "should return a valid object if generate and save succeeds" do
+    Frobnitz.generate(:title => '5', :name => 'blah').should be_valid
+  end
+  
+  it 'should allow attributes to be overriden with string keys' do
+    Frobnitz.generator_for :name => 'thing'
+    Frobnitz.generate('name' => 'boo').name.should == 'boo'
+  end
+
+  describe "supporting mass-assignment protected attributes" do
+    it "should allow setting a value for a non-protected attribute" do
+      ProtectedAttribute.generate!(:public_name => 'no_worries').public_name.should == 'no_worries'
+    end
+
+    it "should have a protected attribute, which is not set when using regular create!" do
+      ProtectedAttribute.create!(:private_name => 'protected name').private_name.should == nil
+    end
+
+    it "should allow setting a value for a protected attribute" do
+      ProtectedAttribute.generate!(:private_name => 'protected name').private_name.should == 'protected name'
     end
   end
 end

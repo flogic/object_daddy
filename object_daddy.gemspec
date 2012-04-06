@@ -10,7 +10,18 @@ Gem::Specification.new do |s|
   s.description = "Fixture killer"
   s.email = ["blogicx@rickbradley.com", "ymendel@pobox.com", "jeremy@jeremypholland.com"]
   s.extra_rdoc_files = ["README.markdown"]
-  s.files = ["README.markdown"]
+  s.files = [
+    "README.markdown",
+    "MIT-LICENSE",
+    "lib/object_daddy.rb",
+    "lib/generators/object_daddy_generator.rb",
+    "lib/object_daddy/railtie.rb",
+    "spec/object_daddy_spec.rb",
+    "spec/spec_helper.rb",
+    "spec/generators/object_daddy_generator_spec.rb",
+    "spec/resources/schema",
+    "spec/resources/config/database.yml"
+  ]
   s.homepage = "http://github.com/awebneck/object_daddy"
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
