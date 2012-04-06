@@ -15,8 +15,7 @@ def setup_rails_database
 
   ENV["RAILS_ENV"] ||= "test"
 
-  db = YAML::load(IO.read("#{dir}/resources/config/database.yml"))
-  ActiveRecord::Base.configurations = {'test' => db['sqlite3']}
+  ActiveRecord::Base.configurations = {'test' => {:adapter => 'sqlite3', :database => dir + '/tmp/object_daddy.db'}}
   ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations['test'])
   ActiveRecord::Migration.verbose = false
   load "#{dir}/resources/schema"
