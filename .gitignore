@@ -1,4 +1,4 @@
 log
 vendor
-spec/tmp/*.db
+spec/tmp/*
 .rvmrc
