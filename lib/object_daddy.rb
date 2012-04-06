@@ -1,3 +1,5 @@
+require 'object_daddy/railtie' if defined? Rails
+
 module ObjectDaddy
 
   def self.included(klass)

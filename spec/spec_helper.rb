@@ -1,5 +1,7 @@
 require 'rubygems'
-require 'active_record'
+require 'rails/all'
+require 'rails/generators'
+require 'rspec/rails'
 
 $:.unshift(File.dirname(__FILE__) + '/../lib/')
 
@@ -19,5 +21,14 @@ def setup_rails_database
   ActiveRecord::Migration.verbose = false
   load "#{dir}/resources/schema"
 
-  require "#{dir}/../init.rb"
+  # def ::ActiveRecord::Base.
+  #   def self.inherited_with_object_daddy(subclass)
+  #     self.inherited_without_object_daddy(subclass)
+  #     subclass.send(:include, ObjectDaddy) unless subclass < ObjectDaddy
+  #   end
+
+  #   class << self
+  #     alias_method_chain :inherited, :object_daddy
+  #   end
+  # end
 end
