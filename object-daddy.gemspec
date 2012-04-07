@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rick Bradley", "Yossef Mendelssohn", "Jeremy Holland"]
-  s.date = "2012-04-06"
+  s.date = "2012-04-07"
   s.description = "Object Daddy is a library (as well as a Ruby on Rails plugin) designed to assist in automating testing of large collections of objects, especially webs of ActiveRecord models. It is a descendent of the \"Object Mother\" pattern for creating objects for testing, and is related to the concept of an \"object exemplar\" or stereotype."
   s.email = ["blogicx@rickbradley.com", "ymendel@pobox.com", "jeremy@jeremypholland.com"]
   s.extra_rdoc_files = [
@@ -18,12 +18,17 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".rspec",
+    "Gemfile",
+    "Gemfile.lock",
+    "LICENSE.txt",
     "README.markdown",
+    "Rakefile",
     "VERSION",
     "lib/generators/object_daddy_generator.rb",
     "lib/object-daddy.rb",
     "lib/object_daddy.rb",
     "lib/object_daddy/railtie.rb",
+    "object-daddy.gemspec",
     "spec/generators/object_daddy_generator_spec.rb",
     "spec/object_daddy_spec.rb",
     "spec/resources/schema",
