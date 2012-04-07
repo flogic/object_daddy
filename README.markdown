@@ -16,9 +16,6 @@ of ActiveRecord models. It is a descendent of the "Object Mother" pattern for
 creating objects for testing, and is related to the concept of an "object
 exemplar" or _stereotype_.
 
-**WARNING** This code is very much at an _alpha_ development stage. Usage, APIs,
-etc., are all subject to change.
-
 See [http://b.logi.cx/2007/11/26/object-daddy](http://b.logi.cx/2007/11/26/object-daddy) for inspiration, historical drama, and too much reading.
 
 ## Installation
