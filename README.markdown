@@ -1,12 +1,14 @@
 Object Daddy
 ============
-_Version 0.4.2 (July 28, 2009)_
+_Version 1.0.0 (April 6, 2012)_
 
-__Authors:__  [Rick Bradley](mailto:blogicx@rickbradley.com), [Yossef Mendelssohn](mailto:ymendel@pobox.com)
+__Authors:__  [Rick Bradley](mailto:blogicx@rickbradley.com), [Yossef Mendelssohn](mailto:ymendel@pobox.com), [Jeremy Holland](mailto:jeremy@jeremypholland.com)
+
+__Gem Maintainer:__  [Jeremy Holland](mailto:jeremy@jeremypholland.com)
 
 __Copyright:__  Copyright (c) 2007, Flawed Logic, OG Consulting, Rick Bradley, Yossef Mendelssohn
 
-__License:__  MIT License.  See MIT-LICENSE file for more details.
+__License:__  MIT License.  See LICENSE.txt file for more details.
 
 Object Daddy is a library (as well as a Ruby on Rails plugin) designed to
 assist in automating testing of large collections of objects, especially webs
@@ -14,31 +16,19 @@ of ActiveRecord models. It is a descendent of the "Object Mother" pattern for
 creating objects for testing, and is related to the concept of an "object
 exemplar" or _stereotype_.
 
-**WARNING** This code is very much at an _alpha_ development stage. Usage, APIs,
-etc., are all subject to change.
-
 See [http://b.logi.cx/2007/11/26/object-daddy](http://b.logi.cx/2007/11/26/object-daddy) for inspiration, historical drama, and too much reading.
 
 ## Installation
 
-Presuming your version of Rails has git plugin installation support:
+Add the following to your Gemfile and run `bundle install`
 
-  script/plugin install git://github.com/flogic/object_daddy.git
+    group :development, :test do
+      gem 'object-daddy'
+    end
 
-Otherwise, you can install object_daddy by hand:
-
-1. Unpack the object_daddy directory into vendor/plugins/ in your rails project.
-2. Run the object_daddy/install.rb Ruby script.
-
-
-## Testing
-
-Install the rspec gem and cd into the object_daddy directory. Type `spec
-spec/` and you should see all specs run successfully. If you have autotest
-from the ZenTest gem installed you can run autotest in that directory.
+Once installed, to set up your exemplars directory, run `rails g object-daddy`
 
 ## Using Object Daddy
-
 
 Object Daddy adds a `.generate` method to every ActiveRecord model which can be
 called to generate a valid instance object of that model class, for use in
@@ -62,7 +52,7 @@ make the main model valid. E.g., given the following models:
 
     class User < ActiveRecord::Base
       belongs_to :login
-      validates_presence_of :login
+      validates :login, :presence => true
     end
 
     class Login < ActiveRecord::Base
@@ -88,12 +78,17 @@ the means of finding a value for the associated attribute: a block, a method
 call, or using a generator class.
 
     class User < ActiveRecord::Base
-      validates_presence_of :email
-      validates_uniqueness_of :email
-      validates_format_of :email, 
-      :with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
-      validates_presence_of :username
-      validates_format_of :username, :with => /^[a-z0-9_]{4,12}$/i
+      validates :email,
+        :presence => true,
+        :uniqueness => true,
+        :format => {
+          :with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
+        }
+      validates :username,
+        :presence => true,
+        :format => {
+          :with => /^[a-z0-9_]{4,12}$/i
+        }
 
       generator_for :email, :start => 'test@domain.com' do |prev|
         user, domain = prev.split('@')
@@ -128,12 +123,12 @@ A simple default block is provided for any generator with a :start value.
       generator_for :name, :start => 'Joe' do |prev|
         prev.succ
       end
-  
+
       generator_for :name, :start => 'Joe'  # equivalent to the above
     end
 
 The _:method_ form takes a symbol naming a class method in the model class to be
-called to generate a new value for the attribute in question. If the method 
+called to generate a new value for the attribute in question. If the method
 takes a single argument, it will act much like the block method of invocation,
 being called with the previous value and generating the next.
 
@@ -177,7 +172,7 @@ will provide a place where model classes can be re-opened and `generator_for`
 calls (and support methods) can be written without polluting the model files
 with Object Daddy information.
 
-Object Daddy, when installed as a Rails plugin, will create
+when the Object Daddy generator is run, it will create
 *RAILS_ROOT/spec/exemplars/* as a place to hold __exemplar__ files for Rails model
 classes.  (We are seeking perhaps some better terminology)
 
@@ -237,7 +232,7 @@ This could be refactored to:
         admin_user.should be_authorized(:create, Company)
       end
     end
-  
+
 Or:
 
     describe "admin user" do
@@ -275,7 +270,7 @@ own, I suppose.
 
 ## Known Issues
 
-The simple invocation forms for `generator_for` when using literal values do not 
+The simple invocation forms for `generator_for` when using literal values do not
 work if the literal value is a Hash. Don't do that.
 
     class User < ActiveRecord::Base
@@ -294,7 +289,7 @@ but only if necessary.
 
     class Item < ActiveRecord::Base
       belongs_to :category
-      validates_presence_of :category
+      validates :category, :presence => true
     end
 
 `Item.generate` will generate a new category, but `some_category.items.generate` will not.
