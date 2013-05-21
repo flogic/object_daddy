@@ -44,12 +44,14 @@ Object Daddy adds a `.generate` method to every ActiveRecord model which can be
 called to generate a valid instance object of that model class, for use in
 testing:
 
-    it "should have a comment for every forum the user posts to" do
-      @user = User.generate
-      @post = Post.generate
-      @post.comments << Comment.generate
-      @user.should have(1).comments
-    end
+```ruby
+it "should have a comment for every forum the user posts to" do
+  @user = User.generate
+  @post = Post.generate
+  @post.comments << Comment.generate
+  @user.should have(1).comments
+end
+```    
 
 This allows us to generate custom model objects without relying on fixtures,
 and without knowing, in our various widespread tests and specs, the details of
@@ -60,14 +62,16 @@ to be changed when the User (Post, Comment, ...) model is refactored later.
 Object Daddy will identify associated classes that need to be instantiated to
 make the main model valid. E.g., given the following models:
 
-    class User < ActiveRecord::Base
-      belongs_to :login
-      validates_presence_of :login
-    end
+```ruby
+class User < ActiveRecord::Base
+  belongs_to :login
+  validates_presence_of :login
+end
 
-    class Login < ActiveRecord::Base
-      has_one :user
-    end
+class Login < ActiveRecord::Base
+  has_one :user
+end
+```
 
 A call to `User.generate` will also make a call to `Login.generate` so that
 `User#login` is present, and therefore valid.
@@ -87,35 +91,37 @@ Object Daddy's `generator_for` method can take three main forms corresponding to
 the means of finding a value for the associated attribute: a block, a method
 call, or using a generator class.
 
-    class User < ActiveRecord::Base
-      validates_presence_of :email
-      validates_uniqueness_of :email
-      validates_format_of :email, 
-      :with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
-      validates_presence_of :username
-      validates_format_of :username, :with => /^[a-z0-9_]{4,12}$/i
+```ruby
+class User < ActiveRecord::Base
+  validates_presence_of :email
+  validates_uniqueness_of :email
+  validates_format_of :email, 
+    :with => /^[-a-z_+0-9.]+@(?:[-a-z_+0-9.]\.)+[a-z]+$/i
+  validates_presence_of :username
+  validates_format_of :username, :with => /^[a-z0-9_]{4,12}$/i
 
-      generator_for :email, :start => 'test@domain.com' do |prev|
-        user, domain = prev.split('@')
-        user.succ + '@' + domain
-      end
+  generator_for :email, :start => 'test@domain.com' do |prev|
+    user, domain = prev.split('@')
+    user.succ + '@' + domain
+  end
 
-      generator_for :username, :method => :next_user
+  generator_for :username, :method => :next_user
 
-      generator_for :ssn, :class => SSNGenerator
+  generator_for :ssn, :class => SSNGenerator
 
-      def self.next_user
-        @last_username ||= 'testuser'
-        @last_username.succ
-      end
-    end
+  def self.next_user
+    @last_username ||= 'testuser'
+    @last_username.succ
+  end
+end
 
-    class SSNGenerator
-      def self.next
-        @last ||= '000-00-0000'
-        @last = ("%09d" % (@last.gsub('-', '').to_i + 1)).sub(/^(\d{3})(\d{2})(\d{4})$/, '\1-\2-\3')
-      end
-    end
+class SSNGenerator
+  def self.next
+    @last ||= '000-00-0000'
+    @last = ("%09d" % (@last.gsub('-', '').to_i + 1)).sub(/^(\d{3})(\d{2})(\d{4})$/, '\1-\2-\3')
+  end
+end
+```
 
 Note that the block method of invocation (as used with _:email_ above) takes an
 optional _:start_ argument, to specify the value of that attribute on the first
@@ -124,13 +130,15 @@ attribute and will generate the next attribute value to be used.
 
 A simple default block is provided for any generator with a :start value.
 
-    class User < ActiveRecord::Base
-      generator_for :name, :start => 'Joe' do |prev|
-        prev.succ
-      end
-  
-      generator_for :name, :start => 'Joe'  # equivalent to the above
-    end
+```ruby
+class User < ActiveRecord::Base
+  generator_for :name, :start => 'Joe' do |prev|
+    prev.succ
+  end
+
+  generator_for :name, :start => 'Joe'  # equivalent to the above
+end
+```
 
 The _:method_ form takes a symbol naming a class method in the model class to be
 called to generate a new value for the attribute in question. If the method 
@@ -144,19 +152,23 @@ The argument (previous value) to the block invocation form can be omitted if
 it's going to be ignored, and simple invocation forms are provided for literal
 values.
 
-    class User < ActiveRecord::Base
-      generator_for(:start_time) { Time.now }
-      generator_for :name, 'Joe'
-      generator_for :age => 25
-    end
+```ruby
+class User < ActiveRecord::Base
+  generator_for(:start_time) { Time.now }
+  generator_for :name, 'Joe'
+  generator_for :age => 25
+end
+```
 
 The developer would then simply call `User.generate` when testing.
 
 If some attribute values are known (or are being controlled during testing)
 then these can simply be passed in to `.generate`:
 
-    @bad_login = Login.generate(:expiry => 1.week.ago)
-    @expired_user = User.generate(:login => @bad_login)
+```ruby
+@bad_login = Login.generate(:expiry => 1.week.ago)
+@expired_user = User.generate(:login => @bad_login)
+```
 
 A `.generate!` method is also provided. The _generate/generate!_ pair of methods
 can be thought of as analogs to create/create!, one merely providing an instance
@@ -191,23 +203,25 @@ exemplar files. The `.generate` method will still exist and be callable, and
 file is available when `.generate` is called on a model, the exemplar file will
 be loaded and used. An example *user_exemplar.rb* appears below:
 
-    require 'ssn_generator'
+```ruby
+require 'ssn_generator'
 
-    class User < ActiveRecord::Base
-      generator_for :email, :start => 'test@domain.com' do |prev|
-        user, domain = prev.split('@')
-        user.succ + '@' + domain
-      end
+class User < ActiveRecord::Base
+  generator_for :email, :start => 'test@domain.com' do |prev|
+    user, domain = prev.split('@')
+    user.succ + '@' + domain
+  end
 
-      generator_for :username, :method => :next_user
+  generator_for :username, :method => :next_user
 
-      generator_for :ssn, :class => SSNGenerator
+  generator_for :ssn, :class => SSNGenerator
 
-      def self.next_user
-        @last_username ||= 'testuser'
-        @last_username.succ
-      end
-    end
+  def self.next_user
+    @last_username ||= 'testuser'
+    @last_username.succ
+  end
+end
+```
 
 ## Blocks
 
@@ -215,54 +229,62 @@ The `spawn`, `generate` and `generate!` methods can all accept a block, to which
 they'll yield the generated object. This provides a nice scoping mechanism in
 your code examples. Consider:
 
-    describe "admin user" do
-      it "should be authorized to create company profiles"
-        admin_user = User.generate!
-        admin_user.activate!
-        admin_user.add_role("admin")
+```ruby
+describe "admin user" do
+  it "should be authorized to create company profiles"
+    admin_user = User.generate!
+    admin_user.activate!
+    admin_user.add_role("admin")
 
-        admin_user.should be_authorized(:create, Company)
-      end
-    end
+    admin_user.should be_authorized(:create, Company)
+  end
+end
+```
 
 This could be refactored to:
 
-    describe "admin user" do
-      it "should be authorized to create company profiles" do
-        admin_user = User.generate! do |user|
-          user.activate!
-          user.add_role("admin")
-        end
-
-        admin_user.should be_authorized(:create, Company)
-      end
+```ruby
+describe "admin user" do
+  it "should be authorized to create company profiles" do
+    admin_user = User.generate! do |user|
+      user.activate!
+      user.add_role("admin")
     end
-  
+
+    admin_user.should be_authorized(:create, Company)
+  end
+end
+```
+
 Or:
 
-    describe "admin user" do
-      it "should be authorized to create company profiles"
-        User.generate! do |user|
-          user.activate!
-          user.add_role("admin")
-        end.should be_authorized(:create, Company)
-      end
-    end
+```ruby
+describe "admin user" do
+  it "should be authorized to create company profiles"
+    User.generate! do |user|
+      user.activate!
+      user.add_role("admin")
+    end.should be_authorized(:create, Company)
+  end
+end
+```
 
 Or even:
 
-    describe "admin user" do
-      def admin_user
-        @admin_user ||= User.generate! do |user|
-          user.activate!
-          user.add_role("admin")
-        end
-      end
-
-      it "should be authorized to create company profiles"
-        admin_user.should be_authorized(:create, Company)
-      end
+```ruby
+describe "admin user" do
+  def admin_user
+    @admin_user ||= User.generate! do |user|
+      user.activate!
+      user.add_role("admin")
     end
+  end
+
+  it "should be authorized to create company profiles"
+    admin_user.should be_authorized(:create, Company)
+  end
+end
+```
 
 This last refactoring allows you to reuse the admin_user method across
 multiple code examples, balancing DRY with local data.
@@ -278,32 +300,38 @@ own, I suppose.
 The simple invocation forms for `generator_for` when using literal values do not 
 work if the literal value is a Hash. Don't do that.
 
-    class User < ActiveRecord::Base
-      generator_for :thing_hash, { 'some key' => 'some value' }
-      generator_for :other_hash => { 'other key' => 'other value' }
-    end
+```ruby
+class User < ActiveRecord::Base
+  generator_for :thing_hash, { 'some key' => 'some value' }
+  generator_for :other_hash => { 'other key' => 'other value' }
+end
+```
 
 I'm not sure why this would even ever come up, but seriously, don't.
 
 Required `belongs_to` associations are automatically generated when generating an instance,
 but only if necessary.
 
-    class Category < ActiveRecord::Base
-      has_many :items
-    end
+```ruby
+class Category < ActiveRecord::Base
+  has_many :items
+end
 
-    class Item < ActiveRecord::Base
-      belongs_to :category
-      validates_presence_of :category
-    end
+
+class Item < ActiveRecord::Base
+  belongs_to :category
+  validates_presence_of :category
+end
+```
 
 `Item.generate` will generate a new category, but `some_category.items.generate` will not.
 Unless, of course, you are foolish enough to define a generator in the exemplar.
 
-    class Item
-      generator_for(:category) { Category.generate }
-    end
-
+```ruby
+class Item
+  generator_for(:category) { Category.generate }
+end
+```
 Once again, don't do that.
 
 ## Rails _surprises_
